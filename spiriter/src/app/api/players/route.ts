@@ -14,48 +14,50 @@ import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
-    // verifyAuthHeader(request); // ensure user is logged in, or skip if public
 
-    // Grab all players
-    const players = await Player.find();
+    // Retrieve all players
+    const players = await Player.find().lean(); 
 
-    console.log('Players:', players);
+    if (!players || players.length === 0) {
+      console.warn("⚠️ No players found in database");
+      return NextResponse.json({ message: "No players found" }, { status: 404 });
+    }
 
-    // For each player, compute derived fields (not stored in DB).
     const result = players.map((p) => {
       const derived = calculateDerivedAttributes({
-        totalRuns: p['Total Runs'] || p.runs,
-        totalBallsFaced: p['Balls Faced'] || p.balls_faced,
-        inningsPlayed: p['Innings Played'] || p.innings_played,
-        totalWicketsTaken: p['Wickets'] || p.wickets,
-        totalBallsBowled: p['Overs Bowled'] || p.overs_bowled,
-        totalRunsConceded: p['Runs Conceded'] || p.runs_conceded
+        totalRuns: p['Total Runs'],
+        totalBallsFaced: p['Balls Faced'] ,
+        inningsPlayed: p['Innings Played'] ,
+        totalWicketsTaken: p['Wickets'] ,
+        totalBallsBowled: p['Overs Bowled'],
+        totalRunsConceded: p['Runs Conceded']
       });
 
       return {
         _id: p._id,
-        name: p.name,
-        university: p.university,
-        category: p.category,
-        stats: p.stats,
-
-        derived: {
-          battingStrikeRate: derived.battingStrikeRate,
-          battingAverage: derived.battingAverage,
-          bowlingStrikeRate: derived.bowlingStrikeRate,
-          economyRate: derived.economyRate,
-          playerPoints: derived.playerPoints,  // if you want to hide points from users, remove this
-          playerValue: derived.playerValue
-        }
+        name: p.Name,
+        university: p.University,
+        category: p.Category,
+        runs: p['Total Runs'],
+        ballsFaced: p['Balls Faced'],
+        inningsPlayed: p['Innings Played'],
+        wickets: p.Wickets,
+        oversBowled: p['Overs Bowled'],
+        runsConceded: p['Runs Conceded'],
+        battingStrikeRate: derived.battingStrikeRate,
+        battingAverage: derived.battingAverage,
+        bowlingStrikeRate: derived.bowlingStrikeRate,
+        economyRate: derived.economyRate,
+        playerPoints: derived.playerPoints,  // if you want to hide points from users, remove this
+        playerValue: derived.playerValue
       };
     });
-
     return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
+    console.error("❌ API Error:", error);
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
-
 
 /**
  * Example of POST with "action": "add" or "remove" in request body

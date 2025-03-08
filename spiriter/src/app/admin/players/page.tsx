@@ -60,6 +60,7 @@ export default function () {
       try {
         const response = await fetch('/api/players');
         const data = await response.json();
+        console.log('Players:', data);
         // Handle different response formats
         if (Array.isArray(data)) {
           setPlayers(data);
