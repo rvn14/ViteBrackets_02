@@ -6,31 +6,31 @@ import User from '@/models/User';
 import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 
 /**
- * GET => list players (public info only: name, uni, category)
- * POST => add or remove players from team, etc. 
- * (Alternatively, you might break them into subroutes.)
+ * GET =>
+ *  - If "userId" is provided as a query parameter, return the corresponding user.
+ *  - Otherwise, list players (public info only: name, uni, category).
  */
 
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
 
-    // Retrieve all players
-    const players = await Player.find().lean(); 
-
+    // Fetch all players
+    const players = await Player.find().lean(); // Use .lean() to return plain objects
     if (!players || players.length === 0) {
       console.warn("⚠️ No players found in database");
       return NextResponse.json({ message: "No players found" }, { status: 404 });
     }
 
+    // Map fields correctly
     const result = players.map((p) => {
       const derived = calculateDerivedAttributes({
-        totalRuns: p['Total Runs'],
-        totalBallsFaced: p['Balls Faced'] ,
-        inningsPlayed: p['Innings Played'] ,
-        totalWicketsTaken: p['Wickets'] ,
-        totalBallsBowled: p['Overs Bowled'],
-        totalRunsConceded: p['Runs Conceded']
+        totalRuns: p["Total Runs"] || 0,
+        totalBallsFaced: p["Balls Faced"] || 0,
+        inningsPlayed: p["Innings Played"] || 0,
+        totalWicketsTaken: p["Wickets"] || 0,
+        totalBallsBowled: p["Overs Bowled"] || 0,
+        totalRunsConceded: p["Runs Conceded"] || 0,
       });
 
       return {
@@ -38,20 +38,21 @@ export async function GET(request: NextRequest) {
         name: p.Name,
         university: p.University,
         category: p.Category,
-        runs: p['Total Runs'],
-        ballsFaced: p['Balls Faced'],
-        inningsPlayed: p['Innings Played'],
-        wickets: p.Wickets,
-        oversBowled: p['Overs Bowled'],
-        runsConceded: p['Runs Conceded'],
+        runs: p["Total Runs"] || 0,
+        ballsFaced: p["Balls Faced"] || 0,
+        inningsPlayed: p["Innings Played"] || 0,
+        wickets: p.Wickets || 0,
+        oversBowled: p["Overs Bowled"] || 0,
+        runsConceded: p["Runs Conceded"] || 0,
         battingStrikeRate: derived.battingStrikeRate,
         battingAverage: derived.battingAverage,
         bowlingStrikeRate: derived.bowlingStrikeRate,
         economyRate: derived.economyRate,
-        playerPoints: derived.playerPoints,  // if you want to hide points from users, remove this
-        playerValue: derived.playerValue
+        playerPoints: derived.playerPoints,
+        playerValue: derived.playerValue,
       };
     });
+
     return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
     console.error("❌ API Error:", error);
@@ -59,8 +60,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
+
 /**
- * Example of POST with "action": "add" or "remove" in request body
+ * Example of POST with "action": "add" or "remove" in request body.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -71,7 +73,6 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
-
     const body = await request.json();
     const { action, playerId } = body;
     if (!action || !playerId) {
