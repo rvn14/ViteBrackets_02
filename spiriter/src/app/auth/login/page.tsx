@@ -22,22 +22,18 @@ export default function LoginPage() {
       setLoading(true);
       const res = await axios.post("/api/auth/login", { username, password });
 
-      // ✅ Store token in localStorage
+      // ✅ Store token & user details in localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
       alert("Login successful!");
 
-      // ✅ Redirect Based on Role
-      if (res.data.user.isAdmin) {
-        router.push("/admin/dashboard");
-      } else {
-        router.push("/dashboard");
-      }
+      // ✅ Redirect User to Dashboard
+      router.push("/dashboard");
 
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response) {
-        setError(err.response.data?.error || "Login failed!");
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.error || "Login failed!");
       } else {
         setError("Login failed!");
       }
@@ -74,7 +70,9 @@ export default function LoginPage() {
   );
 }
 
-const styles: { [key: string]: React.CSSProperties } = {
+import { CSSProperties } from "react";
+
+const styles: { [key: string]: CSSProperties } = {
   container: { display: "flex", flexDirection: "column", alignItems: "center", marginTop: "50px" },
   input: { margin: "10px", padding: "10px", width: "250px" },
   button: { padding: "10px 20px", cursor: "pointer" },
