@@ -1,30 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import { connectToDatabase } from '@/lib/mongodb';
-import User from '@/models/User';
+import { connectToDatabase } from "@/lib/mongodb";
+import User from "@/models/User";
+import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
+  const { username, password } = await req.json();
+
+  if (!username || !password) {
+    return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+  }
+
   try {
-    await connectToDatabase();
-    const { username, password } = await request.json();
+    await connectToDatabase(); // ✅ Connect to MongoDB
 
-    if (!username || !password) {
-      return NextResponse.json({ message: 'Missing credentials' }, { status: 400 });
+    // Check if user already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return NextResponse.json({ error: "Username already exists" }, { status: 400 });
     }
 
-    const userExists = await User.findOne({ username });
-    if (userExists) {
-      return NextResponse.json({ message: 'User already exists' }, { status: 400 });
-    }
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
+    // **✅ Save user in "Users" collection inside "Spirit11" database**
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
-    return NextResponse.json({ message: 'User created successfully' }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    return NextResponse.json({ message: "User registered successfully!" }, { status: 201 });
+  } catch (error) {
+    console.error("Signup error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
