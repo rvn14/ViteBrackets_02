@@ -4,73 +4,26 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PlayerCard, { Player } from '@/components/playerCard';
 
-export default function () {
+export default function PlayersPage() {
   const router = useRouter();
-  
   const [players, setPlayers] = useState<Player[]>([]);
+  const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
 
-  // // In a real app, fetch from your DB or API
-  // const [players, setPlayers] = useState<Player[]>([
-  //   {
-  //     _id: '1',
-  //     name: 'Virat Kohli',
-  //     university: 'Delhi Uni',
-  //     runs: 12000,
-  //     balls_faced: 11000,
-  //     innings_played: 250,
-  //     wickets: 0,
-  //     overs_bowled: 0,
-  //     runs_conceded: 0,
-  //     category: 'Batsman',
-  //     value: 500000,
-  //     points: 120
-  //   },
-  //   {
-  //     _id: '2',
-  //     name: 'Lasith Malinga',
-  //     university: 'Colombo Uni',
-  //     runs: 600,
-  //     balls_faced: 800,
-  //     innings_played: 40,
-  //     wickets: 200,
-  //     overs_bowled: 1500,
-  //     runs_conceded: 1200,
-  //     category: 'Bowler',
-  //     value: 400000,
-  //     points: 90
-  //   },
-  //   {
-  //     _id: '3',
-  //     name: 'Ben Stokes',
-  //     university: 'Leeds Uni',
-  //     runs: 5000,
-  //     balls_faced: 5200,
-  //     innings_played: 120,
-  //     wickets: 150,
-  //     overs_bowled: 2400,
-  //     runs_conceded: 2200,
-  //     category: 'All-rounder',
-  //     value: 800000,
-  //     points: 180
-  //   }
-  // ]);
-
+  // ** Fetch Players on Mount **
   useEffect(() => {
     async function fetchPlayers() {
       try {
         const response = await fetch('/api/players');
         const data = await response.json();
-        console.log('Players:', data);
-        // Handle different response formats
+        console.log('Fetched Players:', data);
+
         if (Array.isArray(data)) {
           setPlayers(data);
-        } else if (Array.isArray(data.players)) {
-          setPlayers(data.players);
-        } else if (data && Object.keys(data).length === 0) {
-          // If data is an empty object, assume there are no players
-          setPlayers([]);
+          setFilteredPlayers(data); // Initialize filter state
         } else {
-          console.error('Unexpected players data format:', data);
+          console.error('Unexpected data format:', data);
+          setPlayers([]);
+          setFilteredPlayers([]);
         }
       } catch (error) {
         console.error('Error fetching players:', error);
@@ -80,26 +33,32 @@ export default function () {
     fetchPlayers();
   }, []);
 
-  // Filters
+  // ** Search and Filters **
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterUniversity, setFilterUniversity] = useState('');
   const [valueRange, setValueRange] = useState<[number, number]>([0, 1000000]);
 
-  // Filter logic
-  const filteredPlayers = players.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory ? p.category === filterCategory : true;
-    const matchesUni = filterUniversity
-      ? p.university.toLowerCase().includes(filterUniversity.toLowerCase())
-      : true;
-    const matchesValue = p.value >= valueRange[0] && p.value <= valueRange[1];
-    return matchesSearch && matchesCategory && matchesUni && matchesValue;
-  });
+  // ** Apply Filters When Inputs Change **
+  useEffect(() => {
+    const filtered = players.filter((p) => {
+      const matchesSearch = p.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filterCategory ? p.category === filterCategory : true;
+      const matchesUni = filterUniversity
+        ? p.university?.toLowerCase().includes(filterUniversity.toLowerCase())
+        : true;
+      const playerValue = p.value || 0; // Ensure value is not undefined
+      const matchesValue = playerValue >= valueRange[0] && playerValue <= valueRange[1];
+
+      return matchesSearch && matchesCategory && matchesUni && matchesValue;
+    });
+
+    setFilteredPlayers(filtered);
+  }, [searchTerm, filterCategory, filterUniversity, valueRange, players]);
 
   return (
     <div className="p-4">
-      {/* Top bar: search, filters, add player button */}
+      {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
         {/* Search Bar */}
         <input
@@ -155,7 +114,7 @@ export default function () {
           />
         </div>
 
-        {/* Add New Player => navigates to /players/add */}
+        {/* Add New Player Button */}
         <button
           onClick={() => router.push('players/add')}
           className="bg-green-600 text-white px-3 py-2 rounded"
@@ -164,17 +123,21 @@ export default function () {
         </button>
       </div>
 
-      {/* Player Cards Grid */}
+      {/* Player Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filteredPlayers.map((player) => (
-          <div
-            key={player._id}
-            className="cursor-pointer"
-            onClick={() => router.push(`/admin/players/${player._id}`)}
-          >
-            <PlayerCard player={player} />
-          </div>
-        ))}
+        {filteredPlayers.length > 0 ? (
+          filteredPlayers.map((player) => (
+            <div
+              key={player._id}
+              className="cursor-pointer"
+              onClick={() => router.push(`/admin/players/${player._id}`)}
+            >
+              <PlayerCard player={player} />
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500 text-center w-full">No players found.</p>
+        )}
       </div>
     </div>
   );

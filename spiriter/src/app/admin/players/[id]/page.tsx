@@ -1,74 +1,54 @@
-import PlayerCard, { Player } from '@/components/playerCard';
+"use client";
 
-async function getPlayerById(id: string): Promise<Player | null> {
-  // In a real app, fetch from your DB or /api/players/:id
-  // Example mock data:
-  const mockPlayers: Player[] = [
-    {
-      _id: '1',
-      name: 'Virat Kohli',
-      university: 'Delhi Uni',
-      runs: 12000,
-      balls_faced: 11000,
-      innings_played: 250,
-      wickets: 0,
-      overs_bowled: 0,
-      runs_conceded: 0,
-      category: 'Batsman',
-      value: 500000,
-      points: 120
-    },
-    {
-      _id: '2',
-      name: 'Lasith Malinga',
-      university: 'Colombo Uni',
-      runs: 600,
-      balls_faced: 800,
-      innings_played: 40,
-      wickets: 200,
-      overs_bowled: 1500,
-      runs_conceded: 1200,
-      category: 'Bowler',
-      value: 400000,
-      points: 90
-    },
-    {
-      _id: '3',
-      name: 'Ben Stokes',
-      university: 'Leeds Uni',
-      runs: 5000,
-      balls_faced: 5200,
-      innings_played: 120,
-      wickets: 150,
-      overs_bowled: 2400,
-      runs_conceded: 2200,
-      category: 'All-rounder',
-      value: 800000,
-      points: 180
+import { useState, useEffect } from 'react';
+
+
+function Dashboard() {
+  const [players, setPlayers] = useState<any[]>([]);
+  const [filteredPlayers, setFilteredPlayers] = useState<any[]>([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    async function fetchPlayers() {
+      try {
+        const response = await fetch('/api/players');
+        const data = await response.json();
+        console.log('Fetched Players:', data);
+
+        if (Array.isArray(data)) {
+          setPlayers(data);
+          setFilteredPlayers(data);
+        } else {
+          console.error('Unexpected data format:', data);
+          setPlayers([]);
+          setFilteredPlayers([]);
+        }
+      } catch (error) {
+        console.error('Error fetching players:', error);
+      }
     }
-  ];
-  return mockPlayers.find((p) => p._id === id) || null;
-}
 
-interface PlayerDetailPageProps {
-  params: { id: string };
-}
+    async function fetchUserDetails() {
+      try {
+        const response = await fetch('/api/users/me'); // Adjust endpoint if needed
+        const data = await response.json();
+        console.log('Fetched User Details:', data);
+        setUser(data);
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    }
 
-export default async function PlayerDetailPage({ params }: PlayerDetailPageProps) {
-  const player = await getPlayerById(params.id);
-
-  if (!player) {
-    return (
-      <div className="p-4">
-        <h2 className="text-xl font-bold">Player not found</h2>
-      </div>
-    );
-  }
+    fetchPlayers();
+    fetchUserDetails();
+  }, []);
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Player Details</h2>
-      <PlayerCard player={player} />
+    <div>
+      <h1>Dashboard</h1>
+      {/* Render players and user details accordingly */}
     </div>
   );
 }
+
+export default Dashboard;
