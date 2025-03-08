@@ -1,15 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb';
-import { verifyAuthHeader } from '@/lib/auth';
-import User from '@/models/User';
+import { connectToDatabase } from "@/lib/mongodb";
+import User from "@/models/User";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+// ✅ GET: Fetch Leaderboard
+export async function GET() {
   try {
     await connectToDatabase();
-    verifyAuthHeader(request);
-    const users = await User.find().select('username totalPoints').sort({ totalPoints: -1 });
-    return NextResponse.json(users);
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+
+    // ✅ Fetch users and sort by points
+    const users = await User.find().sort({ totalPoints: -1 }).limit(10);
+
+    return NextResponse.json(users, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to fetch leaderboard" }, { status: 500 });
   }
 }
