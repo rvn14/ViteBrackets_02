@@ -1,30 +1,30 @@
-import { connectToDatabase } from "@/lib/mongodb";
-import User from "@/models/User";
-import bcrypt from "bcryptjs";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import { connectToDatabase } from '@/lib/mongodb';
+import User from '@/models/User';
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { username, password } = await req.json();
+    await connectToDatabase();
+    const { username, password } = await request.json();
 
     if (!username || !password) {
-      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+      return NextResponse.json({ message: 'Missing credentials' }, { status: 400 });
     }
 
-    await connectToDatabase();
-    const existingUser = await User.findOne({ username });
-
-    if (existingUser) {
-      return NextResponse.json({ error: "Username already exists" }, { status: 400 });
+    const userExists = await User.findOne({ username });
+    if (userExists) {
+      return NextResponse.json({ message: 'User already exists' }, { status: 400 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const newUser = new User({ username, password: hashedPassword });
-
     await newUser.save();
-    return NextResponse.json({ message: "Signup successful" }, { status: 201 });
 
-  } catch (error) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ message: 'User created successfully' }, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
