@@ -7,18 +7,29 @@ if (!MONGODB_URI) {
 }
 
 let cached = (global as any).mongoose;
-
 if (!cached) {
   cached = (global as any).mongoose = { conn: null, promise: null };
 }
 
 export async function connectToDatabase() {
-  if (cached.conn) return cached.conn;
+  console.log("connectToDatabase called");
+
+  if (cached.conn) {
+    console.log("Using cached connection");
+    return cached.conn;
+  }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI as string).then((mongoose) => mongoose);
+    console.log("Creating new connection promise");
+    cached.promise = mongoose.connect(MONGODB_URI as string).then((mongoose) => {
+      console.log("MongoDB connected");
+      return mongoose;
+    });
+  } else {
+    console.log("Using existing connection promise");
   }
 
   cached.conn = await cached.promise;
+  console.log("Connection established");
   return cached.conn;
 }

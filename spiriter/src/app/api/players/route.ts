@@ -14,7 +14,7 @@ import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
-    verifyAuthHeader(request); // ensure user is logged in, or skip if public
+    // verifyAuthHeader(request); // ensure user is logged in, or skip if public
 
     // Grab all players
     const players = await Player.find();
