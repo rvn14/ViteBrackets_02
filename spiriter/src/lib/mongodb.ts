@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
+  throw new Error("Please define MONGODB_URI in your .env.local file");
 }
 
 let cached = (global as any).mongoose || { conn: null, promise: null };
@@ -13,7 +13,7 @@ export async function connectToDatabase() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "Spirit11", // ✅ Ensure we connect to the "Spirit11" database
+      dbName: "Spirit11", // ✅ Make sure we use the "Spirit11" database
     }).then((mongoose) => mongoose);
   }
 
