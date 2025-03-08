@@ -14,6 +14,6 @@ const PlayerSchema = new mongoose.Schema({
   points: { type: Number, default: 0 },
 });
 
-export default mongoose.models.Player || mongoose.model("Player", PlayerSchema);
+export default mongoose.models.Player || mongoose.model("Player", PlayerSchema, "Players");
 
 

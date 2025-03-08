@@ -14,14 +14,23 @@ import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
-    verifyAuthHeader(request); // ensure user is logged in, or skip if public
+    // verifyAuthHeader(request); // ensure user is logged in, or skip if public
 
     // Grab all players
     const players = await Player.find();
 
+    console.log('Players:', players);
+
     // For each player, compute derived fields (not stored in DB).
     const result = players.map((p) => {
-      const derived = calculateDerivedAttributes(p.stats);
+      const derived = calculateDerivedAttributes({
+        totalRuns: p['Total Runs'] || p.runs,
+        totalBallsFaced: p['Balls Faced'] || p.balls_faced,
+        inningsPlayed: p['Innings Played'] || p.innings_played,
+        totalWicketsTaken: p['Wickets'] || p.wickets,
+        totalBallsBowled: p['Overs Bowled'] || p.overs_bowled,
+        totalRunsConceded: p['Runs Conceded'] || p.runs_conceded
+      });
 
       return {
         _id: p._id,
