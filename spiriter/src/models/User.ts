@@ -6,7 +6,7 @@ const UserSchema = new Schema({
   password: { type: String, required: true },
   isAdmin: { type: Boolean, default: false }, // Add isAdmin field
   budget: { type: Number, default: 9000000 },
-  team: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }],
+  team: { type: Schema.Types.ObjectId, ref: 'Team' },
   totalPoints: { type: Number, default: 0 }
 });
 

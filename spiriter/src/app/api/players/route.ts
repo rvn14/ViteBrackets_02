@@ -3,25 +3,50 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { verifyAuthHeader } from '@/lib/auth';
 import Player from '@/models/Player';
 import User from '@/models/User';
+import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 
 /**
  * GET => list players (public info only: name, uni, category)
  * POST => add or remove players from team, etc. 
  * (Alternatively, you might break them into subroutes.)
  */
+
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
-    // Optional: check user is logged in
-    verifyAuthHeader(request);
+    verifyAuthHeader(request); // ensure user is logged in, or skip if public
 
-    // Return partial fields only
-    const players = await Player.find({}, 'name university category');
-    return NextResponse.json(players);
+    // Grab all players
+    const players = await Player.find();
+
+    // For each player, compute derived fields (not stored in DB).
+    const result = players.map((p) => {
+      const derived = calculateDerivedAttributes(p.stats);
+
+      return {
+        _id: p._id,
+        name: p.name,
+        university: p.university,
+        category: p.category,
+        stats: p.stats,
+
+        derived: {
+          battingStrikeRate: derived.battingStrikeRate,
+          battingAverage: derived.battingAverage,
+          bowlingStrikeRate: derived.bowlingStrikeRate,
+          economyRate: derived.economyRate,
+          playerPoints: derived.playerPoints,  // if you want to hide points from users, remove this
+          playerValue: derived.playerValue
+        }
+      };
+    });
+
+    return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
+
 
 /**
  * Example of POST with "action": "add" or "remove" in request body
