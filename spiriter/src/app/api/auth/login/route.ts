@@ -1,53 +1,54 @@
-import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { connectToDatabase } from '@/lib/mongodb';
-import User from '@/models/User';
-import { cookies } from 'next/headers';
+import { connectToDatabase } from "@/lib/mongodb";
+import User from "@/models/User";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+const JWT_SECRET = process.env.JWT_SECRET!;
+
+export async function POST(req: Request) {
   try {
-    await connectToDatabase();
-    const { username, password } = await request.json();
+    const { username, password } = await req.json();
 
     if (!username || !password) {
-      return NextResponse.json({ message: 'Missing credentials' }, { status: 400 });
+      return NextResponse.json({ error: "All fields are required!" }, { status: 400 });
     }
 
+    await connectToDatabase(); // ✅ Connect to MongoDB
+
+    // ✅ Fetch User from MongoDB
     const user = await User.findOne({ username });
     if (!user) {
-      return NextResponse.json({ message: 'Invalid credentials' }, { status: 400 });
+      return NextResponse.json({ error: "Invalid username or password!" }, { status: 400 });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return NextResponse.json({ message: 'Invalid credentials' }, { status: 400 });
+    // ✅ Compare Passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return NextResponse.json({ error: "Invalid username or password!" }, { status: 400 });
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      return NextResponse.json({ message: 'Server error: JWT_SECRET is missing' }, { status: 500 });
-    }
+    // ✅ Generate JWT Token
+    const token = jwt.sign(
+      { userId: user._id, username: user.username, isAdmin: user.isAdmin },
+      JWT_SECRET,
+      { expiresIn: "2h" }
+    );
 
-     const token = jwt.sign(
-        { id: user._id, isAdmin: user.isAdmin },
-        secret,
-        { expiresIn: '1d' }
-      );
+    return NextResponse.json({
+      message: "Login successful!",
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        isAdmin: user.isAdmin,
+        budget: user.budget,
+        totalPoints: user.totalPoints,
+      },
+    }, { status: 200 });
 
-    // Store JWT in HttpOnly cookie
-    const cookieStore = await cookies();
-    cookieStore.set({
-      name: 'token',
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      maxAge: 86400, // 1 day
-    });
-
-    return NextResponse.json({ message: 'Login successful', isAdmin: user.isAdmin, user }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+  } catch (error) {
+    console.error("Login error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
