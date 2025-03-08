@@ -1,0 +1,16 @@
+# env files (can opt-in for committing if needed)
+.env*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.env
+*.log
+
+# IDE
+.vscode/
+.idea/
