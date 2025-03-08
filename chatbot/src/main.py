@@ -5,19 +5,27 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
 from src.api.endpoints import router
-from src.config.settings import CORS_ORIGINS
+# from src.config.settings import CORS_ORIGINS
 from src.config.logging_config import setup_logging
 
 # Set up logging
 setup_logging()
-logger = logging.getLogger(__name__)
+# logging.basicConfig(
+#     level=logging.INFO,  # Set the log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+#     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",  # Log format
+#     handlers=[
+#         logging.StreamHandler(),  # Log to console
+#         logging.FileHandler("app.log")  # Log to a file
+#     ]
+# )
+# logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -39,6 +47,11 @@ async def general_exception_handler(request, exc):
         status_code=500,
         content={"message": "Internal server error"},
     )
+
+@app.on_event("startup")
+async def startup_event():
+    logger = logging.getLogger(__name__)
+    logger.info("Application started successfully")
 
 if __name__ == "__main__":
     import uvicorn

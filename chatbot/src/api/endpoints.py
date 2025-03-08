@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 import logging
 
 from src.models.schemas import Query, ChatResponse, BotConfig
-from src.services.course_bot import Spiriter 
+from src.services.spiriter_bot import Spiriter 
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
