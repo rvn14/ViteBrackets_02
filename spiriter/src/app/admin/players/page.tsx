@@ -87,21 +87,23 @@ export default function PlayersPage() {
   }, [searchTerm, filterCategory, filterUniversity, valueRange, players]);
 
   return (
-    <div className="p-4">
+    <div className="p-4 text-white">
       {/* Search & Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+      <h1 className="text-4xl font-black text-white text-center mb-6">ALL players</h1>
+
+      {/* Search & Filters */}
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-4 mb-8">
         {/* Search Bar */}
         <input
           type="text"
           placeholder="Search by player name..."
-          className="border p-2 flex-1"
+          className="border border-white/40 bg-blue-200/40 text-white/60 rounded p-3 flex-1 min-w-[180px]"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-
         {/* Category Filter */}
         <select
-          className="border p-2"
+          className="border border-white/40 bg-blue-200/40 text-white/60 rounded p-3 flex-1 min-w-[180px]"
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
         >
@@ -110,37 +112,33 @@ export default function PlayersPage() {
           <option value="Bowler">Bowler</option>
           <option value="All-rounder">All-rounder</option>
         </select>
-
         {/* University Filter */}
         <input
           type="text"
-          placeholder="Filter by University"
-          className="border p-2"
+          placeholder="Filter by university..."
+          className="border border-white/40 bg-blue-200/40 text-white/60 rounded p-3 flex-1 min-w-[200px]"
           value={filterUniversity}
           onChange={(e) => setFilterUniversity(e.target.value)}
         />
-
-        {/* Value Range Filter */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Value:</span>
+        {/* Value Range Filters */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className="text-sm text-white">Value:</span>
           <input
             type="number"
-            className="border p-1 w-20"
+            className="border rounded p-3 w-20 border-white/40 bg-blue-200/40 text-white/60"
             placeholder="Min"
             value={valueRange[0]}
             onChange={(e) => setValueRange([Number(e.target.value), valueRange[1]])}
           />
-          <span>-</span>
+          <span className="text-white">-</span>
           <input
             type="number"
-            className="border p-1 w-20"
+            className="border rounded p-3 w-20 border-white/40 bg-blue-200/40 text-white/60"
             placeholder="Max"
             value={valueRange[1]}
             onChange={(e) => setValueRange([valueRange[0], Number(e.target.value)])}
           />
         </div>
-
-        {/* Add New Player Button */}
         <button
           onClick={() => router.push("players/add")}
 
