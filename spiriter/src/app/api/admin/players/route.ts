@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { verifyAuthHeader } from '@/lib/auth';
 import Player from '@/models/Player';
 import User from '@/models/User';
+import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 
 // GET all players (admin only)
 
