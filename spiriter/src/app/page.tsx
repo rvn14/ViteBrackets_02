@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
+import About from "@/components/About";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
 import  Lenis  from "lenis";
@@ -40,8 +41,9 @@ export default function Home() {
       <div className="w-full h-full flex flex-col items-center z-10">
         
         <Hero />
-        <div className="w-full bg-[#000018] h-[2000px] flex flex-col items-center z-20">
-          
+        <div className="relative w-full bg-[#000018] flex flex-col items-center z-10">
+          <img className="absolute w-full h-full object-center object-cover opacity-10" src="/images/bat.jpg" alt=""/>
+            <About />
         </div>
 
       </div>
