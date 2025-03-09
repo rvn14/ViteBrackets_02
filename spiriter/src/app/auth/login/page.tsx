@@ -29,7 +29,7 @@ export default function LoginPage() {
       alert("Login successful!");
 
       // ✅ Redirect User to Dashboard
-      router.push("/dashboard");
+      router.push("/");
 
     } catch (err) {
       if (axios.isAxiosError(err)) {
