@@ -1,25 +1,10 @@
-// import mongoose from "mongoose";
-
-// const PlayerSchema = new mongoose.Schema({
-//   name: { type: String, required: true },
-//   university: { type: String, required: true },
-//   runs: { type: Number, default: 0 },
-//   balls_faced: { type: Number, default: 0 },
-//   innings_played: { type: Number, default: 0 },
-//   wickets: { type: Number, default: 0 },
-//   overs_bowled: { type: Number, default: 0 },
-//   runs_conceded: { type: Number, default: 0 },
-//   category: { type: String, enum: ["Batsman", "Bowler", "All-rounder"], required: true },
-// });
-
-// export default mongoose.models.Player || mongoose.model("Player", PlayerSchema, "Players");
-
-
 import mongoose, { Schema, model, models } from "mongoose";
 
 const PlayerSchema = new Schema({}, { strict: false }); // Allow dynamic fields
 
-// **Virtual Fields to Map MongoDB Fields to Schema-Friendly Names**
+// ------------------------
+// Existing Virtual Fields
+// ------------------------
 PlayerSchema.virtual("name").get(function () {
   return (this as any)["Name"]; // Map "Name" to "name"
 });
@@ -48,9 +33,24 @@ PlayerSchema.virtual("category").get(function () {
   return (this as any)["Category"] || "Unknown"; // Map "Category" to "category"
 });
 
+// ------------------------
+// New Virtual Fields
+// ------------------------
+
+// "playerPoints" => Maps from the "Points" field (or whatever your DB field name is)
+PlayerSchema.virtual("playerPoints").get(function () {
+  // If your DB field is "Points", map it here. If it's different, adjust accordingly.
+  return (this as any)["Points"] || 0;
+});
+
+// "playerValue" => Maps from "Value" or "Price" field in DB (adjust if needed)
+PlayerSchema.virtual("playerValue").get(function () {
+  // If your DB field is "Value", map it here. E.g., "Price", "Player Value", etc.
+  return (this as any)["Value"] || 0;
+});
+
 // Enable virtuals in JSON and Object responses
 PlayerSchema.set("toJSON", { virtuals: true });
 PlayerSchema.set("toObject", { virtuals: true });
 
 export default models.Player || model("Player", PlayerSchema, "Players");
-
