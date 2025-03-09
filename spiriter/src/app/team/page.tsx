@@ -34,10 +34,6 @@ export default function TeamPage() {
     fetchTeam();
   }, []);
 
-  if (loading) return <p>Loading team...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (team.length === 0) return <p>No players selected yet.</p>;
-
   return (
     <div style={{ padding: "20px" }}>
       <h2>My Team</h2>
@@ -51,3 +47,4 @@ export default function TeamPage() {
     </div>
   );
 }
+
