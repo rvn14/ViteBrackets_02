@@ -3,6 +3,7 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -30,10 +31,20 @@ export async function POST(req: Request) {
 
     // ✅ Generate JWT Token
     const token = jwt.sign(
-      { userId: user._id, username: user.username, isAdmin: user.isAdmin },
+      { userId: user._id, username: user.username, budget: user.budget, totalPoints:user.totalPoints, isAdmin: user.isAdmin },
       JWT_SECRET,
       { expiresIn: "2h" }
     );
+
+    const cookieStore = await cookies();
+    cookieStore.set({
+      name: 'token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 86400, // 1 day
+    });
 
     return NextResponse.json({
       message: "Login successful!",
@@ -41,7 +52,6 @@ export async function POST(req: Request) {
       user: {
         id: user._id,
         username: user.username,
-        isAdmin: user.isAdmin,
         budget: user.budget,
         totalPoints: user.totalPoints,
       },

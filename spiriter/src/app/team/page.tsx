@@ -9,15 +9,18 @@ export default function TeamView() {
 
   useEffect(() => {
     const fetchTeam = async () => {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (!user.id) {
-        setError("User not found.");
-        return;
-      }
-
       try {
-        const res = await axios.get(`/api/teams/${user.id}`);
-        setTeam(res.data);
+        // Fetch the authenticated user from the auth/me endpoint
+        const res = await axios.get("/api/auth/me");
+        const user = res.data.user;
+        if (!user?._id) {
+          setError("User not found.");
+          setLoading(false);
+          return;
+        }
+        // Optionally, persist the user in state if needed for rendering (e.g., setUser(currentUser))
+        const { data: teamData } = await axios.get(`/api/teams/${user._id}`);
+        setTeam(teamData);
       } catch (err) {
         setError("Failed to load team.");
       } finally {
