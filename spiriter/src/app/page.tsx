@@ -49,9 +49,7 @@ export default function Home() {
         <div className="relative w-full min-h-screen bg-[#040445] flex flex-col items-center justify-center z-10">
           <div className="text-9xl font-poppins text-white">LEADERBOARD</div>
         </div>
-        <div className="relative w-full min-h-screen bg-[#050578] flex flex-col items-center justify-center z-10 shadow-xl">
-          <div className="text-9xl font-poppins text-white">TOP PLAYERS</div>
-        </div>
+
       </div>
     </main>
         <Footer />
