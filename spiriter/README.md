@@ -1,144 +1,153 @@
-# Spirit11 - Fantasy Cricket Platform
+Spirit11: Inter-University Fantasy Cricket League
 
-[![Next.js Version](https://img.shields.io/badge/Next.js-15.2.1-000000.svg?style=flat&logo=next.js)](https://nextjs.org/)
-[![React Version](https://img.shields.io/badge/React-19.0.0-61DAFB.svg?style=flat&logo=react)](https://react.dev/)
+Welcome to Spirit11, a fantasy cricket league that lets users select university cricket players, manage budgets, and compete on a leaderboard – all integrated with real-time updates and user authentication.
 
-A high-performance fantasy cricket platform built with Next.js 15, featuring real-time gameplay, secure authentication, and immersive animations.
+Table of Contents
 
-## ✨ Features
+Features
+Project Structure
+Setup & Installation
+Environment Variables
+Usage
+Authentication
+Players View
+Select Team
+Team Page
+Budget Tracking
+Leaderboard
+API Routes
+Technologies
+License
+Features
 
-- 🏏 Real-time cricket match updates using Socket.IO
-- 🔒 Secure authentication with NextAuth & JWT
-- 📊 MongoDB integration with Mongoose
-- 🎮 Interactive UI with Framer Motion & GSAP
-- 📱 Responsive design with Tailwind CSS
-- 📈 Player statistics and analytics
-- 💬 Live chat functionality
-- 🔔 Toast notifications system
-- 📝 Markdown content support
+User Authentication
+Users can sign up and log in with a username & password.
+Only authenticated users can access “Players,” “Select Team,” “Team,” and “Leaderboard.”
+Players Tab
+Displays all available players with their basic stats (runs, wickets, etc.).
+Points of each player are hidden from the user, per spec.
+Select Team
+Users pick up to 11 players from the list, track leftover budget.
+Prevent duplicates; only add players if the user has enough leftover budget.
+Shows partial or complete team.
+Team Page
+Displays the user’s selected 11 players with their calculated total points (only once the team has 11 players).
+Allows removing any player from the team (and budget is refunded).
+Budgeting
+Each user starts with Rs.9,000,000.
+Each player has a playerValue.
+If total cost of chosen players exceeds leftover budget, the user can’t add more.
+Removing a player refunds that value back to leftover budget.
+On saving, the server finalizes leftover budget in the Users collection.
+Leaderboard
+Shows all users sorted in descending order by total points.
+Highlights the logged-in user.
+Real-time (optional advanced feature)
+Could use websockets or SSE to reflect updated stats instantly (if required).
+Project Structure
 
-## 🚀 Quick Start
+spirit11/
+├── lib/
+│   ├── calculateDerivedAttributes.ts   # Logic to compute player points & value
+│   └── mongodb.ts                      # MongoDB connection
+├── models/
+│   ├── Player.ts                       # Mongoose schema for players
+│   └── User.ts                         # Mongoose schema for users
+├── src/
+│   ├── app/
+│   │   ├── select-team/
+│   │   │   └── page.tsx                # "Select Team" page (UI + budget logic)
+│   │   ├── team/
+│   │   │   └── page.tsx                # "Team" page, displays selected players
+│   │   ├── leaderboard/
+│   │   │   └── page.tsx                # Leaderboard UI
+│   │   ├── api/
+│   │   │   ├── players/
+│   │   │   │   └── [id]/route.ts       # Players CRUD + GET (calc points on-the-fly)
+│   │   │   ├── teams/
+│   │   │   │   └── [id]/route.ts       # Team logic, saves user team & budget
+│   │   │   └── leaderboard/
+│   │   │       └── route.ts           # Leaderboard data (sorts by user.totalPoints)
+│   └── ...
+├── package.json
+├── README.md                           # This readme
+└── ...
+Setup & Installation
 
-### Prerequisites
-- Node.js 18+
-- MongoDB Atlas cluster
-- Google OAuth credentials (for authentication)
-
-### Installation
-
-1. Clone the repository
-```bash
-git clone https://github.com/your-username/spirit11.git
+Clone the Repo
+git clone https://github.com/YourUser/spirit11.git
 cd spirit11
-Install dependencies
-
-bash
-Copy
+Install Dependencies
 npm install
-Configure environment variables
-
-bash
-Copy
-cp .env.example .env.local
-Start development server
-
-bash
-Copy
+# or
+yarn
+Configure MongoDB in .env or .env.local:
+MONGODB_URI=mongodb+srv://user:pass@cluster.example.com/spirit11
+JWT_SECRET=some_secret_key
+Run the Dev Server
 npm run dev
-⚙️ Configuration
-Environment Variables (.env.local)
-env
-Copy
-MONGODB_URI=your_mongodb_uri
-NEXTAUTH_SECRET=your_secret_key
-NEXTAUTH_URL=http://localhost:3000
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-NEXT_PUBLIC_SOCKET_URL=http://localhost:3000
-🛠 Tech Stack
-Framework: Next.js 15 (App Router)
+# or
+yarn dev
+Visit http://localhost:3000
+Environment Variables
 
-Authentication: NextAuth + JWT
+Typical .env.local:
 
-Database: MongoDB + Mongoose
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>/<dbname>
+JWT_SECRET=someRandomString
+NEXTAUTH_SECRET=someRandomString
+Usage
 
-State Management: React Context
+Authentication
+Sign Up: create an account with username & password.
+Log In: get a session or token stored (depending on your approach).
+If user is not logged in, block access to main features.
+Players View
+GET /api/players fetches the raw stats for each player.
+The UI shows runs, wickets, and other basic stats, but not player points.
+Select Team
+The user sees a list of players.
+They can add up to 11 players, with checks for leftover budget.
+On saving, the server re-checks cost vs. user budget, updates leftover budget in the DB.
+Team Page
+Shows the user’s selected players if any.
+If team.length === 11, displays total points.
+Player removal is allowed.
+Budget Tracking
+Each user’s leftover budget is stored in user.budget (Users collection).
+On each save, we recalc total cost of the chosen players and subtract from leftover.
+If cost > leftover, the server rejects it.
+Leaderboard
+GET /api/leaderboard returns top users sorted by totalPoints.
+The Leaderboard page displays them.
+The logged-in user is highlighted (e.g., bold or different color).
+API Routes
 
-Animations: Framer Motion + GSAP
+/api/players
+GET: Return all players with on-the-fly derived stats (optional)
+POST: Create a new player (raw stats)
+PUT: Update a player’s raw stats
+DELETE: Remove a player
+/api/teams/[id]
+GET: Return user’s existing team
+POST: Save or update a user’s team (and leftover budget)
+/api/leaderboard
+GET: Return an array of users sorted by totalPoints
+Authentication (Login/Signup)
+Possibly POST /api/auth/signup
+POST /api/auth/login
+Technologies
 
-Styling: Tailwind CSS
+Next.js 13 App Router
+React (Client-Side components)
+TypeScript for type definitions
+Mongoose / MongoDB for data storage
+Axios for HTTP requests
+License
 
-HTTP Client: Axios
+MIT License (or your choice).
 
-Form Handling: React Hook Form
+Feel free to adapt or remove licensing text if your project is private or uses a different license.
 
-Notifications: React Hot Toast
-
-Real-time: Socket.IO
-
-📦 Scripts
-npm run dev: Start development server (with Turbopack)
-
-npm run build: Create production build
-
-npm start: Start production server
-
-npm lint: Run ESLint
-
-🚨 Deployment
-Set up production environment variables
-
-Build project:
-
-bash
-Copy
-npm run build
-Start production server:
-
-bash
-Copy
-npm start
-Recommended hosting platforms:
-
-Vercel
-
-AWS Amplify
-
-Netlify
-
-🤝 Contributing
-Fork the repository
-
-Create your feature branch
-
-Commit your changes
-
-Push to the branch
-
-Open a Pull Request
-
-📄 License
-MIT License - see LICENSE for details
-
-Note: Ensure you have proper security measures in place when handling user data and authentication. Use HTTPS in production and keep your secrets secure.
-
-Copy
-
-This README includes:
-1. Badges for key technologies
-2. Feature highlights using emojis
-3. Clear installation instructions
-4. Environment configuration guide
-5. Technology stack breakdown
-6. Deployment instructions
-7. Contribution guidelines
-8. Security reminders
-
-You might want to:
-1. Add screenshots in a dedicated section
-2. Include API documentation if applicable
-3. Add a roadmap section
-4. Include testing instructions
-5. Add team/author information
-
-Let me know if you need any modifications! 🚀
+Enjoy using Spirit11!
+If you have any questions or issues, please open an Issue or submit a Pull Request
