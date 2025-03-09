@@ -22,6 +22,21 @@ export default function TeamView() {
         } else {
           setError("No team data available.");
         }
+
+        try {
+          // Fetch the authenticated user from the auth/me endpoint
+          const res = await axios.get("/api/auth/me");
+          const user = res.data.user;
+          if (!user?._id) {
+            setError("User not found.");
+            setLoading(false);
+            return;
+          }
+          // Optionally, persist the user in state if needed for rendering (e.g., setUser(currentUser))
+          const { data: teamData } = await axios.get(`/api/teams/${user._id}`);
+          setTeam(teamData);
+
+
       } catch (err) {
         setError("Failed to load team.");
         console.error("❌ Error fetching team:", err);
