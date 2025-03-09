@@ -123,7 +123,7 @@ export default function LoginPage() {
         src="/images/grid.png"
         alt=""
       />
-      <div className="absolute top-0 gradDot w-[400px] h-[400px] rounded-full bg-violet-600 blur-[150px] opacity-60 "></div>
+      <div className="absolute top-0 rounded-full w-1/2 h-[500px]  bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0"></div>
       <div className="flex items-center justify-center w-3/5 h-full z-20">
         <div className="hidden xl:flex w-full p- ">
           <img
@@ -137,7 +137,7 @@ export default function LoginPage() {
           ref={formRef}
           className="w-full p-10 flex items-center justify-center z-10"
         >
-          <div className="w-[450px] h-[500px] bg-white/2 backdrop-blur-lg shadow-[rgba(253,252,252,0.5)] rounded-[10px] box-border py-[60px] px-[40px]">
+          <div className="w-[450px] h-[500px] bg-white/2 backdrop-blur-lg border-1 border-white/10 shadow-[rgba(253,252,252,0.5)] rounded-[10px] box-border py-[60px] px-[40px]">
             {/* Title */}
             <p className="text-center mt-[10px] mb-[30px] text-[28px] font-extrabold">
               Welcome back
@@ -179,25 +179,25 @@ export default function LoginPage() {
               {/* Authentication Error */}
               {errors.auth && <p style={{ color: "red" }}>{errors.auth}</p>}
 
-              <p className="underline m-0 text-end text-purple-400 decoration-violet-500">
-                <span className="cursor-pointer text-[9px] font-bold hover:text-purple-300">
+              <p className="underline m-0 text-end text-cyan-400 decoration-cyan-600">
+                <span className="cursor-pointer text-[9px] font-bold hover:text-cyan-300">
                   Forgot Password?
                 </span>
               </p>
               <button
                 type="submit"
-                className="py-[10px] px-[15px] rounded-[20px] outline-none bg-gradient-to-r from-indigo-300 to-purple-400 text-white cursor-pointer shadow-[0_3px_8px_rgba(0,0,0,0.24)] active:shadow-none hover:scale-97 transition duration-100 ease-in"
+                className="py-[10px] px-[15px] rounded-[20px] outline-none bg-gradient-to-r from-cyan-500 to-blue-500 text-white cursor-pointer shadow-[0_3px_8px_rgba(0,0,0,0.24)] active:shadow-none hover:scale-97 transition duration-100 ease-in"
               >
                 Log in
               </button>
             </form>
 
             {/* Sign-up Link */}
-            <p className="m-0 text-[10px] text-[#747474]">
+            <p className="m-0 text-[10px] text-cyan-100">
               Don&apos;t have an account?
               <span
                 onClick={() => router.push("/auth/signup")}
-                className="ml-[1px] text-[11px] underline decoration-violet-500 text-purple-400 cursor-pointer font-extrabold"
+                className="ml-[1px] text-[11px] underline decoration-cyan-600 text-cyan-400 cursor-pointer font-extrabold"
               >
                 Sign up
               </span>

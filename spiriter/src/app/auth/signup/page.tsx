@@ -175,7 +175,7 @@ export default function SignupPage() {
         src="/images/grid.png"
         alt=""
       />
-      <div className="absolute top-0 gradDot w-[400px] h-[400px] rounded-full bg-violet-600 blur-[150px] opacity-60 "></div>
+      <div className="absolute top-0 rounded-full w-1/2 h-[500px] bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0"></div>
 
       <div className="flex items-center justify-center w-3/5 h-full z-20">
         <div className="hidden xl:flex w-full p- ">
@@ -193,7 +193,7 @@ export default function SignupPage() {
             </p>
 
             {/* Sub-title */}
-            <p className="text-center text-[12px] text-purple-300 mt-[-19px] mb-2">
+            <p className="text-center text-[12px] text-cyan-100 mt-[-19px] mb-2">
               Sign up to get started
             </p>
             {/* Form */}
@@ -257,18 +257,18 @@ export default function SignupPage() {
 
               <button
                 type="submit"
-                className="py-[10px] px-[15px] rounded-[20px] outline-none bg-gradient-to-r from-indigo-300 to-purple-400 text-white cursor-pointer shadow-[0_3px_8px_rgba(0,0,0,0.24)] active:shadow-none hover:scale-97 transition duration-100 ease-in"
+                className="py-[10px] px-[15px] rounded-[20px] outline-none bg-gradient-to-r from-cyan-500 to-blue-500 text-white cursor-pointer shadow-[0_3px_8px_rgba(0,0,0,0.24)] active:shadow-none hover:scale-97 transition duration-100 ease-in"
               >
                 Create account
               </button>
             </form>
 
             {/* Sign-up label */}
-            <p className="m-0 text-[10px] text-purple-300 ml-1">
+            <p className="m-0 text-[10px] text-cyan-100 ml-1">
               Already have an account?
               <span
                 onClick={() => router.push("/auth/login")}
-                className="ml-[1px] text-[11px] underline decoration-violet-500 text-purple-400 cursor-pointer font-extrabold"
+                className="ml-[1px] text-[11px] underline decoration-cyan-600 text-cyan-400 cursor-pointer font-extrabold"
               >
                 Log in
               </span>
