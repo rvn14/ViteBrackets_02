@@ -61,34 +61,34 @@ export default function AddPlayerPage() {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Add New Player</h2>
+    <div className="max-w-xl mx-auto bg-white/10 backdrop-blur-md shadow-md rounded-lg font-poppins px-8 py-4">
+      <h2 className="text-2xl font-bold mb-4 text-white text-center font-poppins">Add New Player</h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium">Name</label>
+          <label className="block text-sm font-medium text-white/80">Name</label>
           <input
             type="text"
-            className="border w-full p-2"
+            className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">University</label>
+          <label className="block text-sm font-medium text-white/80">University</label>
           <input
             type="text"
-            className="border w-full p-2"
+            className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
             value={university}
             onChange={(e) => setUniversity(e.target.value)}
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Category</label>
+          <label className="block text-sm font-medium text-white/80">Category</label>
           <select
-            className="border w-full p-2"
+            className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
             value={category}
             onChange={(e) => setCategory(e.target.value as typeof category)}
           >
@@ -99,64 +99,64 @@ export default function AddPlayerPage() {
         </div>
 
         {/* Stats Section */}
-        <h3 className="text-lg font-semibold mt-4">Statistics</h3>
+        <h3 className="text-lg font-semibold mt-4 text-white font-poppins">Statistics</h3>
 
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-sm font-medium">Total Runs</label>
+            <label className="block text-sm font-medium text-white/80">Total Runs</label>
             <input
               type="number"
-              className="border w-full p-2"
+              className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
               value={runs}
               onChange={(e) => setRuns(Number(e.target.value))}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Balls Faced</label>
+            <label className="block text-sm font-medium text-white/80">Balls Faced</label>
             <input
               type="number"
-              className="border w-full p-2"
+              className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
               value={ballsFaced}
               onChange={(e) => setBallsFaced(Number(e.target.value))}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Innings Played</label>
+            <label className="block text-sm font-medium text-white/80">Innings Played</label>
             <input
               type="number"
-              className="border w-full p-2"
+              className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
               value={inningsPlayed}
               onChange={(e) => setInningsPlayed(Number(e.target.value))}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Wickets</label>
+            <label className="block text-sm font-medium text-white/80">Wickets</label>
             <input
               type="number"
-              className="border w-full p-2"
+              className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
               value={wickets}
               onChange={(e) => setWickets(Number(e.target.value))}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Overs Bowled</label>
+            <label className="block text-sm font-medium text-white/80">Overs Bowled</label>
             <input
               type="number"
-              className="border w-full p-2"
+              className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
               value={oversBowled}
               onChange={(e) => setOversBowled(Number(e.target.value))}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Runs Conceded</label>
+            <label className="block text-sm font-medium text-white/80">Runs Conceded</label>
             <input
               type="number"
-              className="border w-full p-2"
+              className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
               value={runsConceded}
               onChange={(e) => setRunsConceded(Number(e.target.value))}
             />
@@ -164,10 +164,10 @@ export default function AddPlayerPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Value</label>
+          <label className="block text-sm font-medium text-white/80">Value</label>
           <input
             type="number"
-            className="border w-full p-2"
+            className="w-full rounded outline-0 text-white bg-white/10 border-2 border-white/20 p-2"
             value={value}
             onChange={(e) => setValue(Number(e.target.value))}
             required
@@ -177,7 +177,7 @@ export default function AddPlayerPage() {
         {/* Submit Button */}
         <button
           type="submit"
-          className={`bg-blue-600 text-white px-4 py-2 rounded w-full ${
+          className={`bg-blue-600 text-white px-4 py-2 rounded w-full cursor-pointer ${
             loading ? "opacity-50" : ""
           }`}
           disabled={loading}

@@ -77,7 +77,7 @@ export default function PlayerDetailPage() {
   if (!player) return <p>Player not found.</p>;
 
   return (
-    <div className="p-6 max-w-2xl mx-auto bg-white shadow-md rounded-lg">
+    <div className="p-6 max-w-2xl mx-auto bg-white/10 border-1 border-white/20 backdrop-blur-lg shadow-md rounded-lg">
 
       {/* Header Image */}
       <img
@@ -86,12 +86,12 @@ export default function PlayerDetailPage() {
         className="mx-auto mb-4"
       />
 
-      <h1 className="text-2xl font-bold mb-4">Player Details</h1>
+      <h1 className="text-2xl font-bold mb-4 text-white text-center">Player Details</h1>
 
       {/* Editable Fields */}
       <div className="space-y-2">
-        <label className="block">
-          <span className="text-gray-700">Name:</span>
+        <label className="block ">
+          <span className="text-white/80">Name:</span>
           <input
             type="text"
             name="Name"
@@ -99,30 +99,30 @@ export default function PlayerDetailPage() {
             value={player.name}
             onChange={handleChange}
             disabled={!isEditing}
-            className={`w-full border p-2 rounded ${isEditing ? "bg-white" : "bg-gray-100"}`}
+            className={`w-full p-2 rounded outline-0 text-white ${isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"}`}
           />
         </label>
 
         <label className="block">
-          <span className="text-gray-700">University:</span>
+          <span className="text-white/80">University:</span>
           <input
             type="text"
             name="University"
             value={player.university}
             onChange={handleChange}
             disabled={!isEditing}
-            className={`w-full border p-2 rounded ${isEditing ? "bg-white" : "bg-gray-100"}`}
+            className={`w-full p-2 rounded outline-0 text-white ${isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"}`}
           />
         </label>
 
         <label className="block">
-          <span className="text-gray-700">Category:</span>
+          <span className="text-white/80">Category:</span>
           <select
             name="category"
             value={player.category}
             onChange={handleChange}
             disabled={!isEditing}
-            className={`w-full border p-2 rounded ${isEditing ? "bg-white" : "bg-gray-100"}`}
+            className={`w-full p-2 rounded outline-0 text-white ${isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"}`}
           >
             <option value="Batsman">Batsman</option>
             <option value="Bowler">Bowler</option>
@@ -131,27 +131,30 @@ export default function PlayerDetailPage() {
         </label>
 
         {/* Stats Section */}
-        <h2 className="text-lg font-semibold mt-4">Statistics</h2>
+        <h2 className="text-lg font-semibold mt-4 text-white">Statistics</h2>
+        <div className="grid grid-cols-2 gap-2">
+
         {["runs", "ballsFaced", "inningsPlayed", "wickets", "oversBowled", "runsConceded"].map(
           (stat) => (
             <label key={stat} className="block">
-              <span className="text-gray-700 capitalize">{stat.replace(/([A-Z])/g, " $1")}:</span>
+              <span className="text-white/80 capitalize">{stat.replace(/([A-Z])/g, " $1")}:</span>
               <input
                 type="number"
                 name={stat}
                 value={player[stat]}
                 onChange={handleChange}
                 disabled={!isEditing}
-                className={`w-full border p-2 rounded ${isEditing ? "bg-white" : "bg-gray-100"}`}
+                className={`w-full p-2 rounded outline-0 text-white ${isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"}`}
               />
             </label>
           )
         )}
+        </div>
         {/* Actions */}
-        <div className="flex gap-2 mt-4">
+        <div className="flex items-center justify-center gap-4 mt-4">
           <button
             onClick={() => setIsEditing(!isEditing)}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
+            className="px-8 py-2 bg-blue-500 text-white rounded cursor-pointer"
           >
             {isEditing ? "Cancel" : "Edit"}
           </button>
@@ -159,7 +162,7 @@ export default function PlayerDetailPage() {
           {isEditing && (
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-green-600 text-white rounded"
+              className="px-8 py-2 bg-green-600 text-white rounded cursor-pointer"
             >
               Save
             </button>
@@ -167,14 +170,14 @@ export default function PlayerDetailPage() {
 
           <button
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 text-white rounded"
+            className="px-8 py-2 bg-red-600 text-white rounded cursor-pointer"
           >
             Delete
           </button>
 
           <button
             onClick={() => router.push("/admin/players")}
-            className="px-4 py-2 bg-gray-500 text-white rounded"
+            className="px-8 py-2 bg-gray-500 text-white rounded cursor-pointer"
           >
             Back
           </button>
