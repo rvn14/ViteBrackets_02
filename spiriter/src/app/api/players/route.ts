@@ -1,12 +1,14 @@
-import { calculateDerivedAttributes } from "@/lib/calculateDerivedAttributes";
-import { connectToDatabase } from "@/lib/mongodb";
-import Player from "@/models/Player";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+import { connectToDatabase } from '@/lib/mongodb';
+import { verifyAuthHeader } from '@/lib/auth';
+import Player from '@/models/Player';
+import User from '@/models/User';
+import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
+
 
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
-
     // Retrieve all players
     const players = await Player.find().lean(); 
 
@@ -17,12 +19,12 @@ export async function GET(request: NextRequest) {
 
     const result = players.map((p) => {
       const derived = calculateDerivedAttributes({
-        totalRuns: p['Total Runs'],
-        totalBallsFaced: p['Balls Faced'] ,
-        inningsPlayed: p['Innings Played'] ,
-        totalWicketsTaken: p['Wickets'] ,
-        totalBallsBowled: p['Overs Bowled'],
-        totalRunsConceded: p['Runs Conceded']
+        totalRuns: p["Total Runs"] || 0,
+        totalBallsFaced: p["Balls Faced"] || 0,
+        inningsPlayed: p["Innings Played"] || 0,
+        totalWicketsTaken: p["Wickets"] || 0,
+        totalBallsBowled: p["Overs Bowled"] || 0,
+        totalRunsConceded: p["Runs Conceded"] || 0,
       });
 
       return {
@@ -30,12 +32,13 @@ export async function GET(request: NextRequest) {
         name: p.Name,
         university: p.University,
         category: p.Category,
-        runs: p['Total Runs'],
-        ballsFaced: p['Balls Faced'],
-        inningsPlayed: p['Innings Played'],
-        wickets: p.Wickets,
-        oversBowled: p['Overs Bowled'],
-        runsConceded: p['Runs Conceded'],
+
+        runs: p["Total Runs"] || 0,
+        ballsFaced: p["Balls Faced"] || 0,
+        inningsPlayed: p["Innings Played"] || 0,
+        wickets: p.Wickets || 0,
+        oversBowled: p["Overs Bowled"] || 0,
+        runsConceded: p["Runs Conceded"] || 0,
         battingStrikeRate: derived.battingStrikeRate,
         battingAverage: derived.battingAverage,
         bowlingStrikeRate: derived.bowlingStrikeRate,
@@ -60,6 +63,10 @@ export async function POST(req: Request) {
     const newPlayer = new Player(playerData);
     await newPlayer.save();
 
+/**
+ * Example of POST with "action": "add" or "remove" in request body.
+ */
+export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Player added successfully!" }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to add player" }, { status: 500 });
@@ -71,6 +78,17 @@ export async function PUT(req: Request) {
   try {
     const { id, ...updatedData } = await req.json();
     await connectToDatabase();
+    const payload = verifyAuthHeader(request);
+    const userId = typeof payload === 'string' ? payload : payload.id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+    const body = await request.json();
+    const { action, playerId } = body;
+    if (!action || !playerId) {
+      return NextResponse.json({ message: 'Missing action or playerId' }, { status: 400 });
+    }
 
     const updatedPlayer = await Player.findByIdAndUpdate(id, updatedData, { new: true });
     if (!updatedPlayer) return NextResponse.json({ error: "Player not found" }, { status: 404 });

@@ -21,14 +21,13 @@ export interface Player {
   name: string;
   university: string;
   runs: number;
-  balls_faced: number;
-  innings_played: number;
+  ballsFaced: number;
+  inningsPlayed: number;
   wickets: number;
-  overs_bowled: number;
-  runs_conceded: number;
-  category: 'Batsman' | 'Bowler' | 'All-rounder';
+  oversBowled: number;
+  runsConceded: number;
+  category: 'Batsman' | 'Bowler' | 'All-Rounder';
   value: number;
-  points: number;
 }
 
 interface PlayerCardProps {
@@ -37,6 +36,8 @@ interface PlayerCardProps {
 
 export default function PlayerCard({ player }: PlayerCardProps) {
   const categoryIcon = getCategoryIcon(player.category);
+  const avatarSrc =  'https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png'; // fallback placeholder image
+
 
   return (
     <div className="relative w-full h-[300px] bg-yellow-300 rounded-lg shadow-lg overflow-hidden flex flex-col items-center justify-end p-2">
@@ -91,6 +92,14 @@ export default function PlayerCard({ player }: PlayerCardProps) {
         alt="Player"
         className="w-24 h-24 rounded-full mb-2"
       />
+      {/* Avatar image placed above the player's name */}
+      <div className="absolute top-12">
+        <img 
+          src={avatarSrc} 
+          alt="Player avatar" 
+          className="w-16 h-16 rounded-full object-cover border-2 border-white"
+        />
+      </div>
 
       {/* Player name & university at the bottom */}
       <div className="text-center">
@@ -99,4 +108,5 @@ export default function PlayerCard({ player }: PlayerCardProps) {
       </div>
     </div>
   );
+
 }

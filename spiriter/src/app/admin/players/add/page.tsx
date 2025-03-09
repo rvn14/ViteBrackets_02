@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
+
 export default function AddPlayerPage() {
   const router = useRouter();
 
@@ -74,8 +75,6 @@ export default function AddPlayerPage() {
             required
           />
         </div>
-
-        {/* University */}
         <div>
           <label className="block text-sm font-medium">University</label>
           <input
@@ -86,8 +85,6 @@ export default function AddPlayerPage() {
             required
           />
         </div>
-
-        {/* Category */}
         <div>
           <label className="block text-sm font-medium">Category</label>
           <select
@@ -166,7 +163,6 @@ export default function AddPlayerPage() {
           </div>
         </div>
 
-        {/* Value */}
         <div>
           <label className="block text-sm font-medium">Value</label>
           <input
@@ -192,3 +188,4 @@ export default function AddPlayerPage() {
     </div>
   );
 }
+

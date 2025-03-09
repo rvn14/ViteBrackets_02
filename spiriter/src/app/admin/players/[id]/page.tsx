@@ -78,6 +78,7 @@ export default function PlayerDetailPage() {
 
   return (
     <div className="p-6 max-w-2xl mx-auto bg-white shadow-md rounded-lg">
+
       {/* Header Image */}
       <img
         src="https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png"
@@ -94,6 +95,7 @@ export default function PlayerDetailPage() {
           <input
             type="text"
             name="Name"
+
             value={player.name}
             onChange={handleChange}
             disabled={!isEditing}
@@ -133,7 +135,7 @@ export default function PlayerDetailPage() {
         {["runs", "ballsFaced", "inningsPlayed", "wickets", "oversBowled", "runsConceded"].map(
           (stat) => (
             <label key={stat} className="block">
-              <span className="text-gray-700">{stat}:</span>
+              <span className="text-gray-700 capitalize">{stat.replace(/([A-Z])/g, " $1")}:</span>
               <input
                 type="number"
                 name={stat}
@@ -145,7 +147,6 @@ export default function PlayerDetailPage() {
             </label>
           )
         )}
-
         {/* Actions */}
         <div className="flex gap-2 mt-4">
           <button

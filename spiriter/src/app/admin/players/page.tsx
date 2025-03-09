@@ -26,6 +26,7 @@ export default function PlayersPage() {
         }
       } catch (error) {
         console.error("Error fetching players:", error);
+
       }
     }
 
@@ -36,6 +37,7 @@ export default function PlayersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterUniversity, setFilterUniversity] = useState("");
+
   const [valueRange, setValueRange] = useState<[number, number]>([0, 1000000]);
 
   // ** Apply Filters When Inputs Change **
@@ -116,6 +118,7 @@ export default function PlayersPage() {
         {/* Add New Player Button */}
         <button
           onClick={() => router.push("players/add")}
+
           className="bg-green-600 text-white px-3 py-2 rounded"
         >
           Add New Player

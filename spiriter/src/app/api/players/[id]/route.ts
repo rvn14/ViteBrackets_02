@@ -13,6 +13,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     let player: any = await Player.findById(id).lean(); // Ensure it returns a plain object
+
     if (Array.isArray(player)) {
       player = player[0];
     }
