@@ -39,8 +39,6 @@ interface PlayerCardProps {
 export default function PlayerCard({ player }: PlayerCardProps) {
   const categoryIcon = getCategoryIcon(player.category);
   const [firstName, ...Lastname] = player.name.split(' ');
-  const avatarSrc =  'https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png'; // fallback placeholder image
-
 
   return (
     <div className="relative w-full h-[300px] bg-white/10 text-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center justify-center p-8">

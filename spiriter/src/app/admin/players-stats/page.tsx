@@ -34,7 +34,7 @@ export default function PlayerStatsPage() {
     const universityMatch = filterUniversity
       ? player.university.toLowerCase().includes(filterUniversity.toLowerCase())
       : true;
-    const value = player.value ?? 0;
+    const value = player.playerValue ?? 0;
     const valueMatch = value >= valueRange[0] && value <= valueRange[1];
     return nameMatch && categoryMatch && universityMatch && valueMatch;
   });

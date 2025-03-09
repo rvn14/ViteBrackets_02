@@ -71,7 +71,7 @@ export default function PlayersPage() {
       const playerName = p.name ? p.name.toLowerCase() : "";
       const playerUniversity = p.university ? p.university.toLowerCase() : "";
       const playerCategory = p.category || "";
-      const playerValue = p.value ?? 0; // Ensure 'value' exists
+      const playerValue = p.playerValue ?? 0; // Ensure 'value' exists
 
       const matchesSearch = playerName.includes(searchTerm.toLowerCase());
       const matchesCategory = filterCategory ? playerCategory === filterCategory : true;
