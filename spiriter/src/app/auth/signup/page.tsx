@@ -175,17 +175,17 @@ export default function SignupPage() {
         src="/images/grid.png"
         alt=""
       />
-      <div className="absolute top-0 rounded-full w-1/2 h-[500px] bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0"></div>
+      <div className="absolute gradDot top-0 rounded-full w-1/2 h-[500px] bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0"></div>
 
       <div className="flex items-center justify-center w-3/5 h-full z-20">
         <div className="hidden xl:flex w-full p- ">
-          <img
+          <img ref={imgRef}
             className="object-center object-cover"
             src="/images/logo.png"
             alt=""
           />
         </div>
-        <div className="w-full p-10 flex items-center justify-center z-10">
+        <div ref={formRef} className="w-full p-10 flex items-center justify-center z-10">
           <div className="w-[450px] h-[550px] bg-white/2 backdrop-blur-lg shadow-[0_5px_15px_rgba(0,0,0,0.35)] rounded-[10px] box-border py-[60px] px-[40px]">
             {/* Title */}
             <p className="text-center mt-[10px] mb-[30px] text-[28px] font-extrabold">
