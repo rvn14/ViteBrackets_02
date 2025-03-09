@@ -9,15 +9,14 @@ export default function BudgetView() {
 
   useEffect(() => {
     const fetchBudget = async () => {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (!user.id) {
-        setError("User not found.");
-        return;
-      }
-
       try {
-        const res = await axios.get(`/api/budget?userId=${user.id}`);
-        setBudget(res.data.budget);
+        const res = await axios.get("/api/auth/me");
+        const user = res.data.user;
+        if (!user) {
+          setError("User not found.");
+        } else {
+          setBudget(user.budget);
+        }
       } catch (err) {
         setError("Failed to load budget.");
       } finally {

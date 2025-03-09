@@ -38,9 +38,9 @@ This guide will help you set up and run the chatbot in a virtual environment.
 
    - terminal will change like this
    ```bash
-    C:\Users\.....\Univate\chatBot\chatBotEnv\Scripts>activate
+    C:\Users\.....\ViteBrackets_02\chatBot\chatBotEnv\Scripts>activate
 
-    '(chatBotEnv)' C:\Users\.....\Univate\chatBot\chatBotEnv\Scripts>
+    '(chatBotEnv)' C:\Users\.....\ViteBrackets_02\chatBot\chatBotEnv\Scripts>
     ```
 
 5. **Navigate back to the chatBot directory:**
@@ -59,7 +59,8 @@ This guide will help you set up and run the chatbot in a virtual environment.
 2. **Add the following line** to the `.env` file:
    ```sh
    MONGO_URI=your_mongo_connection_string
-   GOOGLE_API_KEY=your_api_key
+   GOOGLE_API_KEY_1=your_api_key
+   GOOGLE_API_KEY_2=your_api_key
    ```
 3. **Paste any required API keys** in the `.env` file as needed.
 
@@ -67,7 +68,7 @@ This guide will help you set up and run the chatbot in a virtual environment.
 
 Once the virtual environment is activated and dependencies are installed, run the chatbot server using:
 
-- Make sure that you are in the chatBot dir. `C:\Users\.....\Univate\chatBot`
+- Make sure that you are in the chatBot dir. `C:\Users\.....\ViteBrackets_02\chatBot`
 ```sh
 python -m src.main
 ```

@@ -11,7 +11,8 @@ DB_NAME = 'Spirit11'
 COLLECTION_NAME = 'Players'
 
 # API settings
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY_1')
+CLASSIFIER_GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY_2')
 MODEL_NAME = 'gemini-1.5-pro'
 
 # CORS settings

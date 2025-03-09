@@ -5,13 +5,14 @@ from pymongo import MongoClient
 import google.generativeai as genai
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+from src.services.query_classif import classify_query
 from src.config.settings import MONGODB_URI, DB_NAME, COLLECTION_NAME, GOOGLE_API_KEY, MODEL_NAME
 
 logger = logging.getLogger(__name__)
 
 class Spiriter:
     def __init__(self):
+        logger.info("Initializing Spiriter...")
         # Initialize MongoDB connection
         self.client = MongoClient(MONGODB_URI)
         self.db = self.client[DB_NAME]
@@ -33,7 +34,7 @@ class Spiriter:
         self.chat_history = []
         self.system_prompt = """You are Spiriter, an AI chatbot designed to provide users with information about players' personal details and statistics based on the available dataset. Your responses must be concise, factual, and directly relevant to the user's queries.
                                 1. If a user asks about any player's statistics, retrieve the relevant data from the dataset and provide an accurate response.
-                                2. If a user asks for information that is not available in the dataset, respond with: 'I don't have enough knowledge to answer that question.'
+                                2. If a user asks for information that is not available in the dataset, respond with: 'I don't have enough knowledge to answer that question.' and Do not generate any additional information.
                                 3. Under no circumstances should you reveal a player's points. If a user asks for points, politely refuse to answer without disclosing any numerical values.
                                 4. Maintain a professional and neutral tone in all interactions.
                             Always ensure that your responses align strictly with the data provided and do not generate or infer any additional information beyond the dataset."""     
@@ -107,66 +108,61 @@ class Spiriter:
         info.append(f"Wickets - {player.get('Wickets', '')}")
         info.append(f"Overs Bowled - {player.get('Overs Bowled', '')}")
         info.append(f"Runs Conceded - {player.get('Runs Conceded', '')}")
-        
-        # # Basic course information
-        # info.append(f"Course: {course.get('moduleCode')} - {course.get('moduleTitle')}")
-        # info.append(f"Semester: {', '.join(map(str, course.get('semester', [])))} ({course.get('intake', '')})")
-        # info.append(f"Credits: {course.get('credits')}")
-        # info.append(f"Type: {course.get('compulsoryOrElective')} ({course.get('gpaOrNgpa', '')})")
-        
-        # # Prerequisites
-        # prereqs = course.get('prerequisitesOrCorequisites', [])
-        # if prereqs and any(prereq for prereq in prereqs):
-        #     info.append(f"Prerequisites: {', '.join(prereq for prereq in prereqs if prereq)}")
-        
-        # # Hours per week
-        # if course.get('hoursPerWeek'):
-        #     info.append("\nWeekly Hours:")
-        #     info.append(f"- Lectures: {course['hoursPerWeek'].get('lecture', 0)} hours")
-        #     info.append(f"- Tutorial/Labs: {course['hoursPerWeek'].get('lab_tutes', 0)} hours")
-        
-        # # Evaluation
-        # if course.get('evaluation'):
-        #     info.append("\nEvaluation:")
-        #     info.append(f"- Continuous Assessment (CA): {course['evaluation'].get('CA', 0)}%")
-        #     info.append(f"- Written Exam (WE): {course['evaluation'].get('WE', 0)}%")
-        
-        # # Learning outcomes
-        # if course.get('learningOutcomes'):
-        #     info.append("\nLearning Outcomes:")
-        #     info.extend(f"- {outcome}" for outcome in course['learningOutcomes'] if outcome)
-        
-        # # Syllabus content
-        # if course.get('syllabusOutline') and course['syllabusOutline'].get('content'):
-        #     info.append("\nSyllabus Content:")
-        #     for topic in course['syllabusOutline']['content']:
-        #         if topic.get('topic'):
-        #             info.append(f"\n- {topic['topic']}")
-        #             if topic.get('subtopics') and any(topic['subtopics']):
-        #                 info.extend(f"  * {subtopic}" for subtopic in topic['subtopics'] if subtopic)
-        
+               
         return "\n".join(info)
 
-    def find_relevant_players(self, query: str, top_k: int = 3) -> List[Dict]:
-        """Find most relevant player for the given query"""
+    def find_relevant_players(self, query: str) -> List[Dict]:
+        """Find relevant players based on the query classification."""
         if not self.player_data:
             return []
-            
         try:
-            # Create query vector
-            query_vector = self.vectorizer.transform([query])
-            
-            # Calculate similarities
-            similarities = cosine_similarity(query_vector, self.tfidf_matrix)
-            
-            # Get top-k most similar documents
-            top_indices = np.argsort(similarities[0])[-top_k:][::-1]
-            return [self.player_data[i] for i in top_indices]
-            
+            # Classify the query
+            query_category = classify_query(query)
+            logger.info(f"Query classified as: {query_category}")
+
+            if "LIST_ALL" in query_category:
+                # Extract the category (e.g., "batsmen") from the query
+                if query_category == "LIST_ALL_BATSMEN":
+                    category = "Batsman"
+                elif query_category == "LIST_ALL_BOWLERS":
+                    category = "Bowler"
+                elif query_category == "LIST_ALL_ALLROUNDERS":
+                    category = "All-Rounder"
+                else:
+                    category = None
+
+                # Return all players in the specified category
+                if category:
+                    players = [player for player in self.player_data if player.get("Category", "").lower() == category.lower()]
+                    logger.info(f"Found {len(players)} players in the category: {category}")
+                    return players
+                else:
+                    return self.player_data
+
+            elif query_category == "SPECIFIC_STATS":
+                # Use cosine similarity to find the most relevant player
+                query_vector = self.vectorizer.transform([query])
+                similarities = cosine_similarity(query_vector, self.tfidf_matrix)
+                top_indices = np.argsort(similarities[0])[-1:][::-1]  # Return only the most relevant player
+                return [self.player_data[i] for i in top_indices]
+
+            elif query_category == "RECOMMENDATIONS":
+                # Use cosine similarity to find the top 5 relevant players
+                query_vector = self.vectorizer.transform([query])
+                similarities = cosine_similarity(query_vector, self.tfidf_matrix)
+                top_indices = np.argsort(similarities[0])[-5:][::-1]  # Return top 5 players
+                return [self.player_data[i] for i in top_indices]
+
+            else:
+                # Fallback: Use cosine similarity with default top_k
+                query_vector = self.vectorizer.transform([query])
+                similarities = cosine_similarity(query_vector, self.tfidf_matrix)
+                top_indices = np.argsort(similarities[0])[-3:][::-1]  # Default top_k = 3
+                return [self.player_data[i] for i in top_indices]
         except Exception as e:
             logger.error(f"Error getting relevant player: {str(e)}")
             return []
-
+        
     def generate_response(self, query: str) -> str:
         """Generate a response based on the query and relevant courses using Gemini"""
         try:

@@ -3,23 +3,54 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { verifyAuthHeader } from '@/lib/auth';
 import Player from '@/models/Player';
 import User from '@/models/User';
+import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 
 // GET all players (admin only)
+
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
-    // Check admin
-    const payload = await verifyAuthHeader(request);
-    if (typeof payload === 'string' || !payload.id) {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    // Retrieve all players
+    const players = await Player.find().lean(); 
+
+    if (!players || players.length === 0) {
+      console.warn("⚠️ No players found in database");
+      return NextResponse.json({ message: "No players found" }, { status: 404 });
     }
-    const user = await User.findById(payload.id);
-    if (!user || user.isAdmin !== true) {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-    }
-    const players = await Player.find();
-    return NextResponse.json(players, { status: 200 });
+
+    const result = players.map((p) => {
+      const derived = calculateDerivedAttributes({
+        totalRuns: p["Total Runs"] || 0,
+        totalBallsFaced: p["Balls Faced"] || 0,
+        inningsPlayed: p["Innings Played"] || 0,
+        totalWicketsTaken: p["Wickets"] || 0,
+        totalBallsBowled: p["Overs Bowled"] || 0,
+        totalRunsConceded: p["Runs Conceded"] || 0,
+      });
+
+      return {
+        _id: p._id,
+        name: p.Name,
+        university: p.University,
+        category: p.Category,
+
+        runs: p["Total Runs"] || 0,
+        ballsFaced: p["Balls Faced"] || 0,
+        inningsPlayed: p["Innings Played"] || 0,
+        wickets: p.Wickets || 0,
+        oversBowled: p["Overs Bowled"] || 0,
+        runsConceded: p["Runs Conceded"] || 0,
+        battingStrikeRate: derived.battingStrikeRate,
+        battingAverage: derived.battingAverage,
+        bowlingStrikeRate: derived.bowlingStrikeRate,
+        economyRate: derived.economyRate,
+        playerPoints: derived.playerPoints,  // if you want to hide points from users, remove this
+        playerValue: derived.playerValue
+      };
+    });
+    return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
+    console.error("❌ API Error:", error);
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }

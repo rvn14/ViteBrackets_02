@@ -35,8 +35,6 @@ export default function TeamView() {
           // Optionally, persist the user in state if needed for rendering (e.g., setUser(currentUser))
           const { data: teamData } = await axios.get(`/api/teams/${user._id}`);
           setTeam(teamData);
-
-
       } catch (err) {
         setError("Failed to load team.");
         console.error("❌ Error fetching team:", err);

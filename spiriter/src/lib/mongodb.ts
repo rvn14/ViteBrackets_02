@@ -13,7 +13,7 @@ export async function connectToDatabase() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "Spirit11", // ✅ Make sure we use the "Spirit11" database
+      dbName: "Spirit11", 
     }).then((mongoose) => mongoose);
   }
 

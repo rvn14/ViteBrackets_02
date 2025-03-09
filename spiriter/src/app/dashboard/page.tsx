@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState, CSSProperties } from "react";
 import { useRouter } from "next/navigation";
-
 export default function DashboardPage() {
   interface User {
     username: string;
@@ -10,23 +9,30 @@ export default function DashboardPage() {
 
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userData = localStorage.getItem("user");
-
-    if (!token || !userData) {
-      router.push("/auth/login"); // ✅ Redirect to login if not authenticated
-    } else {
-      setUser(JSON.parse(userData)); // ✅ Set user state
+    async function fetchUser() {
+      try {
+        const response = await fetch("/api/auth/me");
+        if (!response.ok) {
+          router.push("/auth/login");
+          return;
+        }
+        const data = await response.json();
+        setUser(data.user);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        router.push("/auth/login");
+      }
     }
+
+    fetchUser();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // ✅ Remove token
-    localStorage.removeItem("user");  // ✅ Remove user data
-    router.push("/auth/login"); // ✅ Redirect to login
-  };
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/auth/login");
+    router.refresh();
+  }
 
   if (!user) return <h2>Loading...</h2>;
 
