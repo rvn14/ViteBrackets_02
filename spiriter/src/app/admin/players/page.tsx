@@ -2,15 +2,40 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import PlayerCard, { Player } from "@/components/playerCard";
+
 
 export default function PlayersPage() {
   const router = useRouter();
-  const [players, setPlayers] = useState<Player[]>([]);
   const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
+  const [user, setUser] = useState<any | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // ** Fetch Players on Mount **
   useEffect(() => {
+    async function fetchUser() {
+      try {
+        const response = await fetch("/api/auth/me");
+        if (!response.ok) {
+          router.push("/auth/login");
+          return;
+        }
+        const data = await response.json();
+        if (!data.user.isAdmin) {
+          toast.error("Unauthorized action: you do not have permission to access this page.");
+          router.push("/dashboard");
+          return;
+        }
+        setUser(data.user);
+      }
+        catch (error) {
+        console.error("Error fetching user:", error);
+        router.push("/auth/login");
+      }
+    }
+
     async function fetchPlayers() {
       try {
         const response = await fetch("/api/players");
@@ -29,7 +54,7 @@ export default function PlayersPage() {
 
       }
     }
-
+    fetchUser();
     fetchPlayers();
   }, []);
 
