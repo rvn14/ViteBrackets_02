@@ -40,14 +40,12 @@ const Navbar = () => {
             {isLogged?<div className='flex items-center gap-8'>
                 <Link href="/"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Home</div></Link>
                 <Link href="/leaderboard"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Leaderboard</div></Link>
-                <Link href="/players"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Players</div></Link>
                 <Link href="/team"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Your Team</div></Link>
                 <Link href="/auth/login"><div className='cursor-pointer py-2 px-6 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500'>Logout</div></Link>
                 
             </div>:<div className='flex items-center gap-8'>
                 <Link href="/"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Home</div></Link>
                 <Link href="/leaderboard"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Leaderboard</div></Link>
-                <Link href="/leaderboard"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Players</div></Link>
                 <Link href="/auth/signup"><div className='cursor-pointer py-2 px-6 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500'>Sign Up</div></Link>
                 </div>}
         </div>
