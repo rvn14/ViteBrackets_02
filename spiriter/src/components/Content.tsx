@@ -66,11 +66,11 @@ const Nav = () => {
 
                 <Link className='nav-hover-btn' href=''>Home</Link>
 
-                <Link className='nav-hover-btn' href=''>Projects</Link>
+                <Link className='nav-hover-btn' href=''>Leaderboard</Link>
 
-                <Link className='nav-hover-btn' href=''>Our Mission</Link>
+                <Link className='nav-hover-btn' href=''>Players</Link>
 
-                <Link className='nav-hover-btn' href=''>Contact Us</Link>
+                <Link className='nav-hover-btn' href=''>Signup</Link>
 
             </div>
 
