@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function TeamView() {
-  const [team, setTeam] = useState([]);
+  const [team, setTeam] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -12,14 +12,19 @@ export default function TeamView() {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
       if (!user.id) {
         setError("User not found.");
+        setLoading(false);
         return;
       }
-
       try {
         const res = await axios.get(`/api/teams/${user.id}`);
-        setTeam(res.data);
+        if (res.data.players) {
+          setTeam(res.data.players);
+        } else {
+          setError("No team data available.");
+        }
       } catch (err) {
         setError("Failed to load team.");
+        console.error("❌ Error fetching team:", err);
       } finally {
         setLoading(false);
       }
@@ -27,19 +32,20 @@ export default function TeamView() {
     fetchTeam();
   }, []);
 
+  if (loading) return <p>Loading team...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (team.length === 0) return <p>No players selected yet.</p>;
+
   return (
     <div>
       <h2>My Team</h2>
-      {loading ? <p>Loading team...</p> :
-        team.length ? (
-          <ul>
-            {team.map((player: any) => (
-              <li key={player._id}>{player.name} - {player.university} ({player.category})</li>
-            ))}
-          </ul>
-        ) : <p>No players selected yet.</p>
-      }
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <ul>
+        {team.map((player) => (
+          <li key={player._id}>
+            {player.name} - {player.category}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

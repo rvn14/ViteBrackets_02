@@ -1,5 +1,4 @@
 import mongoose, { Schema, model, models } from "mongoose";
-import bcrypt from "bcryptjs";
 
 const UserSchema = new Schema(
   {
@@ -7,18 +6,15 @@ const UserSchema = new Schema(
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
     budget: { type: Number, default: 9000000 },
-    team: { type: Schema.Types.ObjectId, ref: "Team", default: null },
     totalPoints: { type: Number, default: 0 },
+
+    // ✅ "team" is an array of Player ObjectIds
+    team: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }],
+      default: null, // or default: [] if you want an empty array by default
+    },
   },
   { timestamps: true }
 );
 
-// ✅ Pre-save Hook: Hash Password Only When Modified
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
-
-// ✅ Store Users in the "Users" Collection inside "Spirit11" Database
 export default models.User || model("User", UserSchema, "Users");

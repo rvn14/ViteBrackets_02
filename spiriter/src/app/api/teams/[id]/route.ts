@@ -1,83 +1,87 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
-import { verifyAuthHeader } from "@/lib/auth";
-import Team from "@/models/Team";
-import { calculateDerivedAttributes } from "@/lib/calculateDerivedAttributes";
+import mongoose from "mongoose";
+import User from "@/models/User";
 import Player from "@/models/Player";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+// GET: Return the user's team
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectToDatabase();
-    
-    // ✅ Verify authentication
-    const user = verifyAuthHeader(request);
-    if (!user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
 
     const userId = params.id;
-    if (!userId) {
-      return NextResponse.json({ message: "User ID is required" }, { status: 400 });
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
     }
 
-    // ✅ Fetch the team based on User ID, NOT team ID (Ensures users only access their team)
-    const team = await Team.findOne({ user: userId }).populate("players");
-    if (!team) {
-      return NextResponse.json({ message: "Team not found" }, { status: 404 });
+    console.log("Fetching team for user:", userId);
+
+    // ✅ Fetch user and populate the "team" array
+    const user = await User.findById(userId).populate("team");
+    if (!user) {
+      return NextResponse.json({ players: [] }, { status: 200 });
     }
 
-    // ✅ If needed, compute derived stats for each player
-    const playersWithDerived = (team.players as any[]).map((player) => {
-      const derivedStats = calculateDerivedAttributes(player.stats);
-      return {
-        _id: player._id,
-        name: player.name,
-        university: player.university,
-        category: player.category,
-        stats: player.stats,
-        derived: derivedStats,
-      };
-    });
-
-    // ✅ Response Object
-    interface PlayerStats {
-      points?: number;
-      [key: string]: any;
-    }
-
-    interface DerivedStats {
-      [key: string]: any;
-    }
-
-    interface PlayerWithDerived {
-      _id: string;
-      name: string;
-      university: string;
-      category: string;
-      stats: PlayerStats;
-      derived: DerivedStats;
-    }
-
-    interface TeamResponse {
-      _id: string;
-      name: string;
-      user: string;
-      players: PlayerWithDerived[];
-      totalPoints: number;
-    }
-
-    const response: TeamResponse = {
-      _id: team._id as string,
-      name: team.name as string,
-      user: team.user as string,
-      players: playersWithDerived as PlayerWithDerived[],
-      totalPoints: (team.players as any[]).reduce((acc: number, player: any) => acc + (player.stats.points || 0), 0), // Summing up total points
-    };
-
-    return NextResponse.json(response, { status: 200 });
-
+    // If user.team is null or empty, return players: []
+    return NextResponse.json(
+      { players: user.team || [] },
+      { status: 200 }
+    );
   } catch (error: any) {
-    console.error("Error fetching team:", error);
+    console.error("❌ Error fetching team:", error.message);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+// POST: Update the user's "team" field with Player IDs
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectToDatabase();
+
+    const userId = params.id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
+    }
+
+    const body = await request.json();
+    console.log("🔍 Received Request to Save Team =>", body.players);
+
+    // "players" must be a non-empty array of valid player IDs
+    if (!Array.isArray(body.players) || body.players.length === 0) {
+      return NextResponse.json({ message: "Invalid players data" }, { status: 400 });
+    }
+
+    // Ensure the requested players exist
+    const validPlayers = await Player.find({ _id: { $in: body.players } });
+    if (validPlayers.length !== body.players.length) {
+      return NextResponse.json({ message: "Some players not found" }, { status: 400 });
+    }
+
+    // ✅ Upsert the user's "team" field with these players
+    //    (We only do findByIdAndUpdate for the user doc)
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { team: validPlayers }, // you can also do { team: body.players } if you want raw IDs
+      { new: true }
+    ).populate("team");
+
+    if (!updatedUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    console.log("✅ Team saved successfully for user:", updatedUser.username);
+    return NextResponse.json(
+      { message: "Team saved successfully", team: updatedUser.team },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error("❌ Error saving team:", error.message);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
