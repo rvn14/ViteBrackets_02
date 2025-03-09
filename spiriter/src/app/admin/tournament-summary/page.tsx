@@ -22,7 +22,7 @@ export default function TournamentSummaryPage() {
   useEffect(() => {
     async function fetchPlayers() {
       try {
-        const res = await fetch('/api/players');
+        const res = await fetch('/api/admin/players');
         if (!res.ok) {
           throw new Error(`Error: ${res.status} ${res.statusText}`);
         }
@@ -157,9 +157,7 @@ function SummaryCard({
 }) {
   return (
     <div
-      className={`bg-white rounded shadow p-4 flex flex-col items-center ${
-        highlight ? 'border-2 border-blue-500' : ''
-      }`}
+      className={`bg-white rounded shadow p-4 flex flex-col items-center ${highlight ? 'border-2 border-blue-500' : ''}`}
     >
       <h2 className="text-sm font-semibold text-gray-600 mb-1">{title}</h2>
       <p className="text-md font-bold text-center">{value}</p>
