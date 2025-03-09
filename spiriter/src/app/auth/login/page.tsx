@@ -123,7 +123,7 @@ export default function LoginPage() {
         src="/images/grid.png"
         alt=""
       />
-      <div className="absolute top-0 rounded-full w-1/2 h-[500px]  bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0"></div>
+      <div className="absolute gradDot top-0 rounded-full w-1/2 h-[500px]  bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0"></div>
       <div className="flex items-center justify-center w-3/5 h-full z-20">
         <div className="hidden xl:flex w-full p- ">
           <img
