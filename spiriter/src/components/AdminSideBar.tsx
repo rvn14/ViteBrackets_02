@@ -1,11 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function AdminSidebar() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const pathname = usePathname();
 
   // Fetch current user details
   useEffect(() => {
@@ -40,6 +41,15 @@ export default function AdminSidebar() {
     }
   };
 
+  // Function to compute link classes.
+  const linkClasses = (href: string) => {
+    const base =
+      "block py-2 px-3 transition transform hover:scale-105 hover:bg-white/10 rounded";
+    const active = "text-white font-bold bg-white/10";
+    const inactive = "text-white/70";
+    return `${base} ${pathname === href ? active : inactive}`;
+  };
+
   if (!user || !user.isAdmin) return null; // Show sidebar only for admins
 
   return (
@@ -55,10 +65,7 @@ export default function AdminSidebar() {
         </h2>
         <ul className="space-y-2">
           <li>
-            <a
-              href="/admin/players"
-              className="text-white/70 py-2 px-1 hover:text-white"
-            >
+            <a href="/admin/players" className={linkClasses("/admin/players")}>
               Manage Players
             </a>
           </li>
@@ -66,7 +73,7 @@ export default function AdminSidebar() {
           <li>
             <a
               href="/admin/players-stats"
-              className="text-white/70 hover:text-white"
+              className={linkClasses("/admin/players-stats")}
             >
               Player Stats
             </a>
@@ -75,17 +82,14 @@ export default function AdminSidebar() {
           <li>
             <a
               href="/admin/tournament-summary"
-              className="text-white/70 hover:text-white"
+              className={linkClasses("/admin/tournament-summary")}
             >
               Tournament Summary
             </a>
           </li>
           <hr className="border-white/10" />
           <li>
-            <a
-              href="/admin/users"
-              className="text-white/70 hover:text-white"
-            >
+            <a href="/admin/users" className={linkClasses("/admin/users")}>
               Manage Users
             </a>
           </li>
@@ -96,7 +100,7 @@ export default function AdminSidebar() {
       <div className="border-t border-white/10 pt-4">
         <button
           onClick={handleLogout}
-          className="w-full mt-4 px-3 py-2 bg-red-500/80 text-white rounded hover:bg-red-600"
+          className="w-full mt-4 px-3 py-2 bg-red-500/80 text-white rounded hover:bg-red-600 transition-colors"
         >
           Logout
         </button>

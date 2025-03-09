@@ -25,7 +25,7 @@ export default function PlayersPage() {
         const data = await response.json();
         if (!data.user.isAdmin) {
           toast.error("Unauthorized action: you do not have permission to access this page.");
-          router.push("/dashboard");
+          router.push("/");
           return;
         }
         setUser(data.user);
