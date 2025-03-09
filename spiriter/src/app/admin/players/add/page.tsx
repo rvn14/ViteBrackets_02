@@ -43,7 +43,7 @@ export default function AddPlayerPage() {
         value,
       };
 
-      const res = await fetch("/api/players", {
+      const res = await fetch("/api/admin/players", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(playerData),

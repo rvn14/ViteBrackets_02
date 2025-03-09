@@ -26,7 +26,10 @@ export default function AdminSidebar() {
   // Logout Function
   const handleLogout = async () => {
     try {
-      const response = await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
       if (response.ok) {
         router.push("/auth/login"); // Redirect to login after logout
       } else {
@@ -40,38 +43,64 @@ export default function AdminSidebar() {
   if (!user || !user.isAdmin) return null; // Show sidebar only for admins
 
   return (
-    <nav className="p-4 border-r bg-gray-100 h-screen">
-      <h3 className="font-semibold mb-4">Admin Panel</h3>
-      <ul className="space-y-2">
-        <li>
-          <a href="/admin/users" className="text-blue-500 hover:underline">
-            Manage Users
-          </a>
-        </li>
-        <li>
-          <a href="/admin/players" className="text-blue-500 hover:underline">
-            Manage Players
-          </a>
-        </li>
-        <li>
-          <a href="/admin/players-stats" className="text-blue-500 hover:underline">
-            Player Stats
-          </a>
-        </li>
-        <li>
-          <a href="/admin/tournament-summary" className="text-blue-500 hover:underline">
-            Tournament Summary
-          </a>
-        </li>
-        <li>
-          <button
-            onClick={handleLogout}
-            className="w-full mt-4 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </li>
-      </ul>
+    <nav className="flex flex-col justify-between p-4 bg-black/20 h-screen w-64 border-r border-white/10">
+      <div>
+        <img
+          src="/images/logo-hor.png"
+          alt="Spiriter"
+          className="w-32 mx-auto mt-8"
+        />
+        <h2 className="text-white text-center font-black font-poppins mb-8">
+          Admin Panel
+        </h2>
+        <ul className="space-y-2">
+          <li>
+            <a
+              href="/admin/players"
+              className="text-white/70 py-2 px-1 hover:text-white"
+            >
+              Manage Players
+            </a>
+          </li>
+          <hr className="border-white/10" />
+          <li>
+            <a
+              href="/admin/players-stats"
+              className="text-white/70 hover:text-white"
+            >
+              Player Stats
+            </a>
+          </li>
+          <hr className="border-white/10" />
+          <li>
+            <a
+              href="/admin/tournament-summary"
+              className="text-white/70 hover:text-white"
+            >
+              Tournament Summary
+            </a>
+          </li>
+          <hr className="border-white/10" />
+          <li>
+            <a
+              href="/admin/users"
+              className="text-white/70 hover:text-white"
+            >
+              Manage Users
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Admin Details & Logout */}
+      <div className="border-t border-white/10 pt-4">
+        <button
+          onClick={handleLogout}
+          className="w-full mt-4 px-3 py-2 bg-red-500/80 text-white rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
+      </div>
     </nav>
   );
 }

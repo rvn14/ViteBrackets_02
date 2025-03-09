@@ -14,7 +14,7 @@ export default function PlayerDetailPage() {
   useEffect(() => {
     async function fetchPlayer() {
       try {
-        const response = await fetch(`/api/players/${id}`);
+        const response = await fetch(`/api/admin/players/${id}`);
         const data = await response.json();
         console.log("Fetched Player:", data);
         setPlayer(data);
@@ -36,7 +36,7 @@ export default function PlayerDetailPage() {
   // Save edited player details
   const handleSave = async () => {
     try {
-      const response = await fetch(`/api/players/${id}`, {
+      const response = await fetch(`/api/admin/players/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(player),
@@ -58,7 +58,7 @@ export default function PlayerDetailPage() {
     if (!window.confirm("Are you sure you want to delete this player?")) return;
 
     try {
-      const response = await fetch(`/api/players/${id}`, {
+      const response = await fetch(`/api/admin/players/${id}`, {
         method: "DELETE",
       });
 
