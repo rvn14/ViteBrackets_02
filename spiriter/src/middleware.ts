@@ -4,11 +4,11 @@ import jwt from "jsonwebtoken";
 import { jwtVerify } from "jose/jwt/verify";
 
 export async function middleware(request: NextRequest) {
-  console.log(`Middleware Running: ${request.nextUrl.pathname}`);
-
   const token = request.cookies.get("token")?.value;
-  if (!token) {
-    console.log("❌ No token found! Redirecting to login.");
+  
+  const openPaths = ["/", "/players", "/leaderbord"];
+
+  if (!token && !openPaths.includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
