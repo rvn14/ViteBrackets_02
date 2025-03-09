@@ -78,6 +78,13 @@ export default function PlayerDetailPage() {
 
   return (
     <div className="p-6 max-w-2xl mx-auto bg-white shadow-md rounded-lg">
+      {/* Header Image */}
+      <img
+        src="https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png"
+        alt="Players Icon"
+        className="mx-auto mb-4"
+      />
+
       <h1 className="text-2xl font-bold mb-4">Player Details</h1>
 
       {/* Editable Fields */}
@@ -109,8 +116,8 @@ export default function PlayerDetailPage() {
         <label className="block">
           <span className="text-gray-700">Category:</span>
           <select
-            name="Category"
-            value={player.Category}
+            name="category"
+            value={player.category}
             onChange={handleChange}
             disabled={!isEditing}
             className={`w-full border p-2 rounded ${isEditing ? "bg-white" : "bg-gray-100"}`}
@@ -138,13 +145,6 @@ export default function PlayerDetailPage() {
             </label>
           )
         )}
-
-        {/* Computed Stats - Read-Only */}
-        <h2 className="text-lg font-semibold mt-4">Derived Statistics</h2>
-        <p>Batting Strike Rate: {player.battingStrikeRate}</p>
-        <p>Batting Average: {player.battingAverage}</p>
-        <p>Bowling Strike Rate: {player.bowlingStrikeRate}</p>
-        <p>Economy Rate: {player.economyRate}</p>
 
         {/* Actions */}
         <div className="flex gap-2 mt-4">

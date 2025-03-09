@@ -12,7 +12,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ message: "Player ID is required" }, { status: 400 });
     }
 
-    const player = await Player.findById(id).lean(); // Ensure it returns a plain object
+    let player: any = await Player.findById(id).lean(); // Ensure it returns a plain object
+    if (Array.isArray(player)) {
+      player = player[0];
+    }
     if (!player) {
       return NextResponse.json({ message: "Player not found" }, { status: 404 });
     }

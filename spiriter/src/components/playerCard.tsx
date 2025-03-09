@@ -9,7 +9,7 @@ function getCategoryIcon(category: string) {
       return '⚾'; // or a cricket bat icon
     case 'Bowler':
       return '🏏'; // or a cricket ball icon
-    case 'All-rounder':
+    case 'All-Rounder':
       return '⭐'; // or any star/all-rounder icon
     default:
       return '❓';
@@ -53,13 +53,27 @@ export default function PlayerCard({ player }: PlayerCardProps) {
 
           {/* Hidden popup that appears on hover */}
           <div className="absolute left-6 top-0 bg-white text-black text-sm p-2 w-48 rounded shadow-md hidden group-hover:block z-10">
-            <p><strong>Runs:</strong> {player.runs}</p>
-            <p><strong>Balls Faced:</strong> {player.balls_faced}</p>
-            <p><strong>Innings:</strong> {player.innings_played}</p>
-            <p><strong>Wickets:</strong> {player.wickets}</p>
-            <p><strong>Overs Bowled:</strong> {player.overs_bowled}</p>
-            <p><strong>Runs Conceded:</strong> {player.runs_conceded}</p>
-            <p><strong>Points:</strong> {player.points}</p>
+            <p>
+              <strong>Runs:</strong> {player.runs}
+            </p>
+            <p>
+              <strong>Balls Faced:</strong> {player.balls_faced}
+            </p>
+            <p>
+              <strong>Innings:</strong> {player.innings_played}
+            </p>
+            <p>
+              <strong>Wickets:</strong> {player.wickets}
+            </p>
+            <p>
+              <strong>Overs Bowled:</strong> {player.overs_bowled}
+            </p>
+            <p>
+              <strong>Runs Conceded:</strong> {player.runs_conceded}
+            </p>
+            <p>
+              <strong>Points:</strong> {player.points}
+            </p>
           </div>
         </div>
       </div>
@@ -70,6 +84,13 @@ export default function PlayerCard({ player }: PlayerCardProps) {
           {categoryIcon}
         </div>
       </div>
+
+      {/* Player Image */}
+      <img
+        src="https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png"
+        alt="Player"
+        className="w-24 h-24 rounded-full mb-2"
+      />
 
       {/* Player name & university at the bottom */}
       <div className="text-center">
