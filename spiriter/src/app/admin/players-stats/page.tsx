@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import PlayerStatsCard, { PlayerStats } from '@/components/PlayerStatsCard';
 
 /**
- * Page that fetches all players from /api/players and displays them
+ * Page that fetches all players from /api/admin/players and displays them
  * as row-like cards using the PlayerStatsCard component.
  */
 export default function PlayerStatsPage() {
@@ -14,7 +14,7 @@ export default function PlayerStatsPage() {
   useEffect(() => {
     async function fetchPlayers() {
       try {
-        const res = await fetch('/api/players');
+        const res = await fetch('/api/admin/players');
         if (!res.ok) {
           throw new Error(`Error: ${res.status} ${res.statusText}`);
         }

@@ -22,7 +22,7 @@ export default function TournamentSummaryPage() {
   useEffect(() => {
     async function fetchPlayers() {
       try {
-        const res = await fetch('/api/players');
+        const res = await fetch('/api/admin/players');
         if (!res.ok) {
           throw new Error(`Error: ${res.status} ${res.statusText}`);
         }
