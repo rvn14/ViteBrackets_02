@@ -1,64 +1,44 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, CSSProperties } from "react";
 import { useRouter } from "next/navigation";
-import {jwtDecode} from "jwt-decode";
 
-export default function Dashboard() {
+export default function DashboardPage() {
+  interface User {
+    username: string;
+    // Add other user properties if needed
+  }
+
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-  const [username, setUsername] = useState("");
 
   useEffect(() => {
-    const activeUser = localStorage.getItem("active_user");
-    if (!activeUser) {
-      router.push("/auth/login");
-      return;
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+
+    if (!token || !userData) {
+      router.push("/auth/login"); // ✅ Redirect to login if not authenticated
+    } else {
+      setUser(JSON.parse(userData)); // ✅ Set user state
     }
-
-    const token = localStorage.getItem(`token_${activeUser}`);
-
-    if (!token) {
-      router.push("/auth/login");
-      return;
-    }
-
-    try {
-      // Decode JWT token
-      const decodedToken: { username: string; exp: number } = jwtDecode(token);
-
-      // Check if token has expired
-      if (decodedToken.exp * 1000 < Date.now()) {
-        localStorage.removeItem(`token_${activeUser}`);
-        localStorage.removeItem("active_user");
-        router.push("/auth/login");
-        return;
-      }
-
-      setUsername(decodedToken.username);
-    } catch (error) {
-      console.error("Invalid token:", error);
-      localStorage.removeItem(`token_${activeUser}`);
-      localStorage.removeItem("active_user");
-      router.push("/auth/login");
-    }
-  }, [router]);
+  }, []);
 
   const handleLogout = () => {
-    const activeUser = localStorage.getItem("active_user");
-    if (activeUser) {
-      localStorage.removeItem(`token_${activeUser}`);
-      localStorage.removeItem("active_user");
-    }
-    router.push("/auth/login");
+    localStorage.removeItem("token"); // ✅ Remove token
+    localStorage.removeItem("user");  // ✅ Remove user data
+    router.push("/auth/login"); // ✅ Redirect to login
   };
 
+  if (!user) return <h2>Loading...</h2>;
+
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Welcome, {username}!</h1>
-      <p>You have successfully logged in.</p>
-      <button onClick={handleLogout} style={{ marginTop: "20px", padding: "10px 20px" }}>
-        Log Out
-      </button>
+    <div style={styles.container}>
+      <h2>Welcome, {user.username}!</h2>
+      <button onClick={handleLogout} style={styles.button}>Logout</button>
     </div>
   );
 }
+
+const styles: { container: CSSProperties; button: CSSProperties } = {
+  container: { textAlign: "center", marginTop: "50px" },
+  button: { padding: "10px 20px", cursor: "pointer" },
+};

@@ -53,3 +53,4 @@ PlayerSchema.set("toJSON", { virtuals: true });
 PlayerSchema.set("toObject", { virtuals: true });
 
 export default models.Player || model("Player", PlayerSchema, "Players");
+
