@@ -122,7 +122,7 @@ export default function ChatBot() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-full right-0 mb-20 bg-black text-white rounded-lg p-3 text-sm whitespace-nowrap shadow-lg"
+              className="absolute bottom-full right-0 mb-20 bg-black/30 text-white rounded-lg p-3 text-sm whitespace-nowrap shadow-lg"
             >
               <div className="relative">
                 Need help? Chat with Spirit! 👋
@@ -263,7 +263,7 @@ export default function ChatBot() {
                     type="submit"
                     disabled={isLoading}
                     className="px-4 py-2 bg-[#1789DC] text-white rounded-lg
-                             hover:bg-[#5da5d8] hover:text-white border border-black
+                             hover:bg-[#5da5d8] hover:text-white
                              focus:outline-none focus:ring-z focus:ring-[#76b6e4]
                              disabled:opacity-50 transition-colors duration-200
                              font-medium cursor-pointer"
