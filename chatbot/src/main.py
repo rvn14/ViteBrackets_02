@@ -5,27 +5,18 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
 from src.api.endpoints import router
-# from src.config.settings import CORS_ORIGINS
 from src.config.logging_config import setup_logging
+from src.config.settings import CORS_ORIGINS
 
 # Set up logging
 setup_logging()
-# logging.basicConfig(
-#     level=logging.INFO,  # Set the log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-#     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",  # Log format
-#     handlers=[
-#         logging.StreamHandler(),  # Log to console
-#         logging.FileHandler("app.log")  # Log to a file
-#     ]
-# )
-# logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[CORS_ORIGINS],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

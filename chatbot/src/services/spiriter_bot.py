@@ -6,6 +6,7 @@ import google.generativeai as genai
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from src.services.query_classif import classify_query
+from src.services.best_team import get_best_eleven
 from src.config.settings import MONGODB_URI, DB_NAME, COLLECTION_NAME, GOOGLE_API_KEY, MODEL_NAME
 
 logger = logging.getLogger(__name__)
@@ -30,12 +31,13 @@ class Spiriter:
         # Chat configuration
         self.temperature = 0.7
         self.max_tokens = 200
-        self.context_window = 5 
+        self.context_window = 3 
         self.chat_history = []
-        self.system_prompt = """You are Spiriter, an AI chatbot designed to provide users with information about players' personal details and statistics based on the available dataset. Your responses must be concise, factual, and directly relevant to the user's queries.
-                                1. If a user asks about any player's statistics, retrieve the relevant data from the dataset and provide an accurate response.
-                                2. If a user asks for information that is not available in the dataset, respond with: 'I don't have enough knowledge to answer that question.' and Do not generate any additional information.
-                                3. Under no circumstances should you reveal a player's points. If a user asks for points, politely refuse to answer without disclosing any numerical values.
+        self.system_prompt = """You are Spiriter, an AI chatbot designed to provide users with information about players' personal details and statistics based on the available dataset. Your responses must be well structured ,concise, factual, and directly relevant to the user's queries.
+                                1. If a user asks about any player's statistics, retrieve the relevant, data from the dataset and provide an accurate response.
+                                2. If user asks the best team mention the all 11 players names, their universities, and their categories one by one. Do not miss anyone.
+                                3. If user asks the RECOMMENDATIONS then tell about all the player names and their relevent scores. Do not miss anyone.
+                                3. If a user asks for information that is not available in the dataset, respond with: 'I don't have enough knowledge to answer that question.' and Do not generate any additional information.
                                 4. Maintain a professional and neutral tone in all interactions.
                             Always ensure that your responses align strictly with the data provided and do not generate or infer any additional information beyond the dataset."""     
         # Initialize data
@@ -76,6 +78,7 @@ class Spiriter:
         """Prepare context for the model using relevant player content and chat history."""
         # Get relevant course content
         relevant_player = self.find_relevant_players(query)
+        logger.info(f"Found {len(relevant_player)} relevant players")
         
         if not relevant_player:
             return "I couldn't find any relevant players for your query."
@@ -152,6 +155,15 @@ class Spiriter:
                 similarities = cosine_similarity(query_vector, self.tfidf_matrix)
                 top_indices = np.argsort(similarities[0])[-5:][::-1]  # Return top 5 players
                 return [self.player_data[i] for i in top_indices]
+            
+            elif query_category == "BEST_ELEVEN":
+                player_names = get_best_eleven()
+                players = []
+                for player in self.player_data:
+                    if player.get("Name", "") in player_names:
+                        players.append(player)
+                # logger.info(f"Found {players} players in the BEST_ELEVEN")
+                return players
 
             else:
                 # Fallback: Use cosine similarity with default top_k
@@ -162,7 +174,7 @@ class Spiriter:
         except Exception as e:
             logger.error(f"Error getting relevant player: {str(e)}")
             return []
-        
+               
     def generate_response(self, query: str) -> str:
         """Generate a response based on the query and relevant courses using Gemini"""
         try:
