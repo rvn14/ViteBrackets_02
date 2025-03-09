@@ -1,2 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geo:ital@0;1&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Teko:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geo:ital@0;1&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Teko:wght@300..700&display=swap');
 @import "tailwindcss";
 
+
+
+
+@utility bg-mesh{
+  background-image: linear-gradient(to right, rgb(17, 24, 39), rgb(75, 85, 99));
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+@utility floating-nav-black {
+  @apply bg-[#131313] border-white/20 backdrop-blur-sm rounded-4xl border;
+}
+
+
+@theme {
+
+  --font-poppins: Poppins, sans-serif;
+  --font-geo: Geo, sans-serif;
+  --font-space-mono: Space Mono, monospace;
+
+
+  --color-blue-50: #dfdff0;
+  --color-blue-75: #dfdff2;
+  --color-blue-100: #f0f2fa;
+  --color-blue-200: #010101;
+  --color-blue-300: #4fb7dd;
+
+  --color-hero-btn: #c8b6ff;
+
+  --color-violet-300: #5724ff;
+
+  --color-yellow-100: #8e983f;
+  --color-yellow-300: #edff66;
+  --color-tomato: #ff6347;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto;
+  }
+  
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .native-scroll {
+    overflow-y: auto !important;
+    scroll-behavior: auto !important;
+    pointer-events: auto !important;
+  }
+  
+  /* Disable smooth scrolling in native container */
+  .native-scroll * {
+    scroll-snap-type: none !important;
+  }
+
+  .chatcont::-webkit-scrollbar {
+    width: 5px;
+    background-color: rgba(255, 255, 255, 0.233);
+    
+  }
+
+  .chatcont::-webkit-scrollbar-thumb {
+    background-color: #76b6e4;
+    border-radius: 5px;
+  }

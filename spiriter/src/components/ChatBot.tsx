@@ -6,6 +6,7 @@ import { IoMdClose } from "react-icons/io";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import MarkdownRenderer from "./MarkdownRender";
 
+
 interface Message {
   role: "user" | "bot";
   content: string;
@@ -43,6 +44,10 @@ export default function ChatBot() {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+
+
+  
+
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -117,7 +122,7 @@ export default function ChatBot() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-full right-0 mb-20 bg-black text-white rounded-lg p-3 text-sm whitespace-nowrap shadow-lg"
+              className="absolute bottom-full right-0 mb-20 bg-black/30 text-white rounded-lg p-3 text-sm whitespace-nowrap shadow-lg"
             >
               <div className="relative">
                 Need help? Chat with Spirit! 👋
@@ -133,23 +138,26 @@ export default function ChatBot() {
         </AnimatePresence>
 
         <motion.div
+          
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
-          className="fixed bottom-4 right-4 z-50"
+          className="fixed bottom-4 right-4 z-50 "
         >
           <button
             onClick={() => setIsOpen(true)}
             className={`p-4 text-white rounded-full shadow-lg 
+                      cursor-pointer
                      transition-all duration-200 
                      ${isOpen ? "hidden" : "flex"}
-                     animate-gradient bg-gradient-to-r from-black via-gray-600 to-black
+                      bg-white/10 hover:bg-white/15
+                      transition-all duration-500 backdrop-blur-3xl
                      background-animate hover:shadow-xl`}
             style={{
               backgroundSize: "200% 200%",
             }}
           >
-            <IoChatbubbleEllipsesSharp className="w-9 h-9" />
+            <IoChatbubbleEllipsesSharp className="w-9 h-9 text-[#76b6e4] shadow-xl" />
           </button>
         </motion.div>
       </div>
@@ -162,10 +170,10 @@ export default function ChatBot() {
             exit={{ opacity: 0, y: 20 }}
             className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] md:w-[500px] z-50"
           >
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-700">
-              <div className="bg-violet-400 text-black p-4 flex justify-between items-center">
+            <div className=" bg-white/5 backdrop-blur-xl rounded-lg shadow-xl overflow-hidden border border-white/20">
+              <div className="bg-white/8 text-white font-geo text-xl p-4 flex justify-between items-center">
                 <div className="flex flex-row gap-3 items-center w-full">
-                  <h2 className="font-semibold">Spirit</h2>
+                  <h2 className="font-semibold select-none">SPIRITER AI</h2>
                   {/* <img
                     src="/logo.png"
                     alt="Bot"
@@ -174,13 +182,13 @@ export default function ChatBot() {
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-white hover:text-gray-300 transition-colors"
+                  className="text-white hover:text-gray-300 transition-colors cursor-pointer"
                 >
                   <IoMdClose className="w-6 h-6" />
                 </button>
               </div>
 
-              <div className="h-[500px] overflow-y-auto p-4 space-y-4">
+              <div  className="chatcont h-[500px] overflow-y-auto p-4 space-y-4">
                 {messages.map((message, index) => (
                   <motion.div
                     key={index}
@@ -193,8 +201,8 @@ export default function ChatBot() {
                     <div
                       className={`max-w-[85%] rounded-lg p-4 ${
                         message.role === "user"
-                          ? "bg-violet-400 text-white ml-auto "
-                          : "bg-purple-400 text-white"
+                          ? "bg-[#76b6e4] text-white ml-auto "
+                          : "bg-[#1789DC] text-white"
                       }`}
                     >
                       <div className="whitespace-pre-wrap text-sm md:text-base flex flex-row gap-2 items-start">
@@ -238,27 +246,27 @@ export default function ChatBot() {
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="border-t border-gray-200 p-4">
+              <div className="border-t border-white/20 p-4">
                 <form onSubmit={handleSubmit} className="flex space-x-4">
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Ask about player..."
-                    className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                             bg-white text-gray-900
-                             focus:outline-none focus:ring-2 focus:ring-violet-400
-                             placeholder-gray-800"
+                    className="flex-1 p-2  rounded-lg 
+                              text-white
+                             focus:outline-none focus:ring-1 focus:ring-[#76b6e4]
+                             placeholder-gray-300"
                     disabled={isLoading}
                   />
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-4 py-2 bg-indigo-300 text-white rounded-lg
-                             hover:bg-white hover:text-black border border-black
-                             focus:outline-none focus:ring-2 focus:ring-violet-400
+                    className="px-4 py-2 bg-[#1789DC] text-white rounded-lg
+                             hover:bg-[#5da5d8] hover:text-white
+                             focus:outline-none focus:ring-z focus:ring-[#76b6e4]
                              disabled:opacity-50 transition-colors duration-200
-                             font-medium"
+                             font-medium cursor-pointer"
                   >
                     Send
                   </button>
