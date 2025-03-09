@@ -55,37 +55,32 @@ export async function GET(request: NextRequest) {
 }
 
 // ✅ POST: Add a New Player
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const playerData = await req.json();
     await connectToDatabase();
     
     const newPlayer = new Player(playerData);
     await newPlayer.save();
-
-/**
- * Example of POST with "action": "add" or "remove" in request body.
- */
-export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Player added successfully!" }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Failed to add player" }, { status: 500 });
   }
 }
 
+
 // ✅ PUT: Update Player (Requires `id` in request body)
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
   try {
-    const { id, ...updatedData } = await req.json();
+    const body = await req.json();
+    const { id, action, playerId, ...updatedData } = body;
     await connectToDatabase();
-    const payload = verifyAuthHeader(request);
+    const payload = verifyAuthHeader(req);
     const userId = typeof payload === 'string' ? payload : payload.id;
     const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
-    const body = await request.json();
-    const { action, playerId } = body;
     if (!action || !playerId) {
       return NextResponse.json({ message: 'Missing action or playerId' }, { status: 400 });
     }
@@ -94,13 +89,14 @@ export async function PUT(req: Request) {
     if (!updatedPlayer) return NextResponse.json({ error: "Player not found" }, { status: 404 });
 
     return NextResponse.json({ message: "Player updated successfully!", updatedPlayer }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Failed to update player" }, { status: 500 });
   }
 }
+    await connectToDatabase();
 
 // ✅ DELETE: Remove Player (Requires `id` in request body)
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   try {
     const { id } = await req.json();
     await connectToDatabase();
@@ -109,7 +105,7 @@ export async function DELETE(req: Request) {
     if (!deletedPlayer) return NextResponse.json({ error: "Player not found" }, { status: 404 });
 
     return NextResponse.json({ message: "Player deleted successfully!" }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: "Failed to delete player" }, { status: 500 });
   }
 }

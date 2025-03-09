@@ -58,22 +58,22 @@ export default function PlayerCard({ player }: PlayerCardProps) {
               <strong>Runs:</strong> {player.runs}
             </p>
             <p>
-              <strong>Balls Faced:</strong> {player.balls_faced}
+              <strong>Balls Faced:</strong> {player.ballsFaced}
             </p>
             <p>
-              <strong>Innings:</strong> {player.innings_played}
+              <strong>Innings:</strong> {player.inningsPlayed}
             </p>
             <p>
               <strong>Wickets:</strong> {player.wickets}
             </p>
             <p>
-              <strong>Overs Bowled:</strong> {player.overs_bowled}
+              <strong>Overs Bowled:</strong> {player.oversBowled}
             </p>
             <p>
-              <strong>Runs Conceded:</strong> {player.runs_conceded}
+              <strong>Runs Conceded:</strong> {player.runsConceded}
             </p>
             <p>
-              <strong>Points:</strong> {player.points}
+              <strong>Value:</strong> {player.value}
             </p>
           </div>
         </div>
@@ -92,14 +92,6 @@ export default function PlayerCard({ player }: PlayerCardProps) {
         alt="Player"
         className="w-24 h-24 rounded-full mb-2"
       />
-      {/* Avatar image placed above the player's name */}
-      <div className="absolute top-12">
-        <img 
-          src={avatarSrc} 
-          alt="Player avatar" 
-          className="w-16 h-16 rounded-full object-cover border-2 border-white"
-        />
-      </div>
 
       {/* Player name & university at the bottom */}
       <div className="text-center">
