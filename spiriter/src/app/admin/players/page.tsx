@@ -38,7 +38,7 @@ export default function PlayersPage() {
 
     async function fetchPlayers() {
       try {
-        const response = await fetch("/api/players");
+        const response = await fetch("/api/admin/players");
         const data = await response.json();
 
         if (Array.isArray(data)) {
