@@ -3,15 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 
-function Dashboard() {
+export default function PlayerDetailPage() {
   const router = useRouter();
   const { id } = useParams(); // Get player ID from URL
   const [player, setPlayer] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false); // Toggle edit mode
-  const avatarSrc =  'https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png';
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch player details & user details
+  // Fetch player details
   useEffect(() => {
     async function fetchPlayer() {
       try {
@@ -21,11 +20,12 @@ function Dashboard() {
         setPlayer(data);
       } catch (error) {
         console.error("Error fetching player details:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchPlayer();
-    setLoading(false);
   }, [id]);
 
   // Handle input changes
@@ -78,16 +78,15 @@ function Dashboard() {
 
   return (
     <div className="p-6 max-w-2xl mx-auto bg-white shadow-md rounded-lg">
-      <h1 className="text-2xl font-bold mb-4">Player Details</h1>
 
-      {/* Player Info */}
-      <div className="flex items-center gap-4">
-        <img
-          src={avatarSrc}
-          alt="Player avatar"
-          className="w-16 h-16 rounded-full object-cover border-2 border-white"
-        />
-      </div>
+      {/* Header Image */}
+      <img
+        src="https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png"
+        alt="Players Icon"
+        className="mx-auto mb-4"
+      />
+
+      <h1 className="text-2xl font-bold mb-4">Player Details</h1>
 
       {/* Editable Fields */}
       <div className="space-y-2">
@@ -95,7 +94,8 @@ function Dashboard() {
           <span className="text-gray-700">Name:</span>
           <input
             type="text"
-            name="name"
+            name="Name"
+
             value={player.name}
             onChange={handleChange}
             disabled={!isEditing}
@@ -107,7 +107,7 @@ function Dashboard() {
           <span className="text-gray-700">University:</span>
           <input
             type="text"
-            name="university"
+            name="University"
             value={player.university}
             onChange={handleChange}
             disabled={!isEditing}
@@ -147,40 +147,30 @@ function Dashboard() {
             </label>
           )
         )}
-
-        {/* Computed Stats - Read-Only */}
-        <h2 className="text-lg font-semibold mt-4">Derived Statistics</h2>
-        <p>Batting Strike Rate: {player.battingStrikeRate}</p>
-        <p>Batting Average: {player.battingAverage}</p>
-        <p>Bowling Strike Rate: {player.bowlingStrikeRate}</p>
-        <p>Economy Rate: {player.economyRate}</p>
-
         {/* Actions */}
         <div className="flex gap-2 mt-4">
-            <>
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-              >
-                {isEditing ? "Cancel" : "Edit"}
-              </button>
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            {isEditing ? "Cancel" : "Edit"}
+          </button>
 
-              {isEditing && (
-                <button
-                  onClick={handleSave}
-                  className="px-4 py-2 bg-green-600 text-white rounded"
-                >
-                  Save
-                </button>
-              )}
+          {isEditing && (
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-green-600 text-white rounded"
+            >
+              Save
+            </button>
+          )}
 
-              <button
-                onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded"
-              >
-                Delete
-              </button>
-            </>
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-600 text-white rounded"
+          >
+            Delete
+          </button>
 
           <button
             onClick={() => router.push("/admin/players")}
@@ -193,5 +183,3 @@ function Dashboard() {
     </div>
   );
 }
-
-export default Dashboard;

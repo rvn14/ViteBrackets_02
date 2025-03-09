@@ -9,7 +9,7 @@ function getCategoryIcon(category: string) {
       return '⚾'; // or a cricket bat icon
     case 'Bowler':
       return '🏏'; // or a cricket ball icon
-    case 'All-rounder':
+    case 'All-Rounder':
       return '⭐'; // or any star/all-rounder icon
     default:
       return '❓';
@@ -54,19 +54,27 @@ export default function PlayerCard({ player }: PlayerCardProps) {
 
           {/* Hidden popup that appears on hover */}
           <div className="absolute left-6 top-0 bg-white text-black text-sm p-2 w-48 rounded shadow-md hidden group-hover:block z-10">
-            <img 
-              src={avatarSrc} 
-              alt="Player avatar" 
-              className="w-16 h-16 rounded-full object-cover border-2 border-white"
-            />
-            <p><strong>Runs:</strong> {player.name}</p>
-            <p><strong>Balls Faced:</strong> {player.university}</p>
-            <p><strong>Runs:</strong> {player.runs}</p>
-            <p><strong>Balls Faced:</strong> {player.ballsFaced}</p>
-            <p><strong>Innings:</strong> {player.inningsPlayed}</p>
-            <p><strong>Wickets:</strong> {player.wickets}</p>
-            <p><strong>Overs Bowled:</strong> {player.oversBowled}</p>
-            <p><strong>Runs Conceded:</strong> {player.runsConceded}</p>
+            <p>
+              <strong>Runs:</strong> {player.runs}
+            </p>
+            <p>
+              <strong>Balls Faced:</strong> {player.balls_faced}
+            </p>
+            <p>
+              <strong>Innings:</strong> {player.innings_played}
+            </p>
+            <p>
+              <strong>Wickets:</strong> {player.wickets}
+            </p>
+            <p>
+              <strong>Overs Bowled:</strong> {player.overs_bowled}
+            </p>
+            <p>
+              <strong>Runs Conceded:</strong> {player.runs_conceded}
+            </p>
+            <p>
+              <strong>Points:</strong> {player.points}
+            </p>
           </div>
         </div>
       </div>
@@ -78,6 +86,12 @@ export default function PlayerCard({ player }: PlayerCardProps) {
         </div>
       </div>
 
+      {/* Player Image */}
+      <img
+        src="https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png"
+        alt="Player"
+        className="w-24 h-24 rounded-full mb-2"
+      />
       {/* Avatar image placed above the player's name */}
       <div className="absolute top-12">
         <img 

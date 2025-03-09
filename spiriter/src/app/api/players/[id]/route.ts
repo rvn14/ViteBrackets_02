@@ -12,7 +12,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ message: "Player ID is required" }, { status: 400 });
     }
 
-    let player = await Player.findById(id).lean(); // Ensure it returns a plain object
+    let player: any = await Player.findById(id).lean(); // Ensure it returns a plain object
+
     if (Array.isArray(player)) {
       player = player[0];
     }
@@ -35,12 +36,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       name: player.Name,
       university: player.University,
       category: player.Category,
-      runs: (player as any)["Total Runs"] || 0,
-      ballsFaced: (player as any)["Balls Faced"] || 0,
-      inningsPlayed: (player as any)["Innings Played"] || 0,
-      wickets: (player as any)["Wickets"] || 0,
-      oversBowled: (player as any)["Overs Bowled"] || 0,
-      runsConceded: (player as any)["Runs Conceded"] || 0,
+      runs: player["Total Runs"] || 0,
+      ballsFaced: player["Balls Faced"] || 0,
+      inningsPlayed: player["Innings Played"] || 0,
+      wickets: player.Wickets || 0,
+      oversBowled: player["Overs Bowled"] || 0,
+      runsConceded: player["Runs Conceded"] || 0,
       battingStrikeRate: derived.battingStrikeRate,
       battingAverage: derived.battingAverage,
       bowlingStrikeRate: derived.bowlingStrikeRate,

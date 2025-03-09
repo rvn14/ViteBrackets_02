@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import PlayerCard, { Player } from '@/components/playerCard';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import PlayerCard, { Player } from "@/components/playerCard";
 
 export default function PlayersPage() {
   const router = useRouter();
@@ -13,44 +13,49 @@ export default function PlayersPage() {
   useEffect(() => {
     async function fetchPlayers() {
       try {
-        const response = await fetch('/api/players');
+        const response = await fetch("/api/players");
         const data = await response.json();
-        console.log('Fetched Players:', data);
 
         if (Array.isArray(data)) {
           setPlayers(data);
-          setFilteredPlayers(data); // Initialize filter state
+          setFilteredPlayers(data); // Initialize filters
         } else {
-          console.error('Unexpected data format:', data);
+          console.error("Unexpected data format:", data);
           setPlayers([]);
           setFilteredPlayers([]);
         }
       } catch (error) {
-        console.error('Error fetching players:', error);
+        console.error("Error fetching players:", error);
+
       }
     }
 
     fetchPlayers();
   }, []);
 
-  // ** Search and Filters **
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('');
-  const [filterUniversity, setFilterUniversity] = useState('');
+  // ** Filters **
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterUniversity, setFilterUniversity] = useState("");
+
   const [valueRange, setValueRange] = useState<[number, number]>([0, 1000000]);
 
   // ** Apply Filters When Inputs Change **
   useEffect(() => {
     const filtered = players.filter((p) => {
-      const matchesSearch = p.name?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = filterCategory ? p.category === filterCategory : true;
-      const matchesUni = filterUniversity
-        ? p.university?.toLowerCase().includes(filterUniversity.toLowerCase())
+      const playerName = p.name ? p.name.toLowerCase() : "";
+      const playerUniversity = p.university ? p.university.toLowerCase() : "";
+      const playerCategory = p.category || "";
+      const playerValue = p.value ?? 0; // Ensure 'value' exists
+
+      const matchesSearch = playerName.includes(searchTerm.toLowerCase());
+      const matchesCategory = filterCategory ? playerCategory === filterCategory : true;
+      const matchesUniversity = filterUniversity
+        ? playerUniversity.includes(filterUniversity.toLowerCase())
         : true;
-      const playerValue = p.value || 0; // Ensure value is not undefined
       const matchesValue = playerValue >= valueRange[0] && playerValue <= valueRange[1];
 
-      return matchesSearch && matchesCategory && matchesUni && matchesValue;
+      return matchesSearch && matchesCategory && matchesUniversity && matchesValue;
     });
 
     setFilteredPlayers(filtered);
@@ -98,9 +103,7 @@ export default function PlayersPage() {
             className="border p-1 w-20"
             placeholder="Min"
             value={valueRange[0]}
-            onChange={(e) =>
-              setValueRange([Number(e.target.value), valueRange[1]])
-            }
+            onChange={(e) => setValueRange([Number(e.target.value), valueRange[1]])}
           />
           <span>-</span>
           <input
@@ -108,15 +111,14 @@ export default function PlayersPage() {
             className="border p-1 w-20"
             placeholder="Max"
             value={valueRange[1]}
-            onChange={(e) =>
-              setValueRange([valueRange[0], Number(e.target.value)])
-            }
+            onChange={(e) => setValueRange([valueRange[0], Number(e.target.value)])}
           />
         </div>
 
         {/* Add New Player Button */}
         <button
-          onClick={() => router.push('players/add')}
+          onClick={() => router.push("players/add")}
+
           className="bg-green-600 text-white px-3 py-2 rounded"
         >
           Add New Player
