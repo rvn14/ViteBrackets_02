@@ -14,9 +14,10 @@ def classify_query(query: str) -> str:
         1.1 LIST_ALL_BATSMEN - The user is asking for a list of all batsmen.
         1.2 LIST_ALL_BOWLERS - The user is asking for a list of all bowlers.
         1.3 LIST_ALL_ALLROUNDERS - The user is asking for a list of all all-rounders.
-    2. SPECIFIC_STATS - The user is asking for specific player statistics (e.g., "What are John's batting stats?").
-    3. RECOMMENDATIONS - The user is asking for recommendations (e.g., "Who are the best bowlers?").
-    4. OTHER - The query does not fit into any of the above categories.
+    2. BEST_ELEVEN - The user is asking for the best eleven players. (e.g, "Who are the best eleven players?", "Who are the Best team?").
+    3. SPECIFIC_STATS - The user is asking for specific player statistics (e.g., "What are John's batting stats?").
+    4. RECOMMENDATIONS - The user is asking for recommendations (e.g., "Who are the best bowlers?").
+    5. OTHER - The query does not fit into any of the above categories.
 
     You only need to provide the category name. Do not include any other information. Just Identify the category. Then, provide the category name below.
 

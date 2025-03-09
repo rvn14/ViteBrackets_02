@@ -3,6 +3,7 @@ import logging
 
 from src.models.schemas import Query, ChatResponse, BotConfig
 from src.services.spiriter_bot import Spiriter 
+from src.services.best_team import get_best_eleven
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -62,3 +63,14 @@ async def clear_history():
 @router.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+# return the best team
+@router.get("/best-team")
+async def best_team():
+    try:
+        logger.info("Fetching best team")
+        best_team = get_best_eleven()
+        return best_team
+    except Exception as e:
+        logger.error(f"Error fetching best team: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
