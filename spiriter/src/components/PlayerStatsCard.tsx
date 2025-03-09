@@ -34,10 +34,10 @@ interface PlayerStatsCardProps {
  */
 export default function PlayerStatsCard({ player }: PlayerStatsCardProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded shadow">
+    <div className="flex flex-wrap items-center justify-between bg-blue-200/30 border-1 border-cyan-400/40 p-4 rounded-2xl shadow">
       {/* Left section: name, university, category */}
       <div className="w-full sm:w-1/3 mb-2 sm:mb-0">
-        <h2 className="font-semibold text-lg">{player.name}</h2>
+        <h2 className="font-bold text-xl text-white ">{player.name}</h2>
         <p className="text-sm text-gray-500">{player.university}</p>
         <p className="text-sm text-gray-500">{player.category}</p>
       </div>
@@ -51,7 +51,7 @@ export default function PlayerStatsCard({ player }: PlayerStatsCardProps) {
         <StatBox label="Innings" value={player.inningsPlayed} />
         <StatBox label="Bat SR" value={player.battingStrikeRate.toFixed(2)} />
         <StatBox label="Econ" value={player.economyRate.toFixed(2)} />
-        <StatBox label="Value" value={player.playerValue} />
+        <StatBox label="Value (LKR)" value={player.playerValue} />
       </div>
     </div>
   );
@@ -61,8 +61,8 @@ export default function PlayerStatsCard({ player }: PlayerStatsCardProps) {
 function StatBox({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="text-center min-w-[80px]">
-      <p className="text-xs font-medium text-gray-600">{label}</p>
-      <p className="text-sm font-semibold">{value}</p>
+      <p className="text-xs font-medium text-gray-300/80 mb-1.5">{label}</p>
+      <p className="text-sm font-semibold text-white text-whit">{value}</p>
     </div>
   );
 }
