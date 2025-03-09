@@ -1,19 +1,33 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
+type Player = {
+  _id: string;
+  name: string;
+  university: string;
+  category: string;
+  runs: number;
+  wickets: number;
+  ballsFaced: number;
+  playerPoints: number;
+  playerValue: number;
+};
 
 export default function SelectTeam() {
-  const [players, setPlayers] = useState<any[]>([]);
-  const [team, setTeam] = useState<any[]>([]);
+  const router = useRouter();
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [team, setTeam] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Fetch players from DB
     const fetchPlayers = async () => {
       try {
         const res = await axios.get("/api/players");
-        console.log("Fetched Players in Frontend:", res.data); // ✅ Debugging Log
-        setPlayers(res.data);
+        setPlayers(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         setError("Failed to load players.");
       } finally {
@@ -21,47 +35,89 @@ export default function SelectTeam() {
       }
     };
     fetchPlayers();
+
+    // Restore local 'team' from localStorage (optional)
+    const savedTeam = JSON.parse(localStorage.getItem("selectedTeam") || "[]");
+    setTeam(savedTeam);
   }, []);
 
-  const addToTeam = (player: any) => {
+  // Add a player
+  const addPlayer = (player: Player) => {
     if (team.length < 11 && !team.some((p) => p._id === player._id)) {
-      setTeam([...team, player]);
+      const newTeam = [...team, player];
+      setTeam(newTeam);
+      localStorage.setItem("selectedTeam", JSON.stringify(newTeam));
+    }
+  };
+
+  // Remove a player
+  const removePlayer = (playerId: string) => {
+    const newTeam = team.filter((p) => p._id !== playerId);
+    setTeam(newTeam);
+    localStorage.setItem("selectedTeam", JSON.stringify(newTeam));
+  };
+
+  // Save the team to the user's doc in DB
+  const saveTeam = async () => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (!user.id) {
+      setError("User not found.");
+      return;
+    }
+    try {
+      // We only send array of IDs
+      const playerIds = team.map((p) => p._id);
+      const res = await axios.post(`/api/teams/${user.id}`, { players: playerIds });
+      console.log("Team saved in DB:", res.data);
+      alert("Team saved successfully!");
+      router.push("/team");
+    } catch (err) {
+      console.error("Error saving team:", err);
+      setError("Failed to save team.");
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h2>Select Your Team</h2>
       <h4>Selected Players: {team.length}/11</h4>
 
-      {/* Show Loading or Error */}
       {loading && <p>Loading players...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* Available Players List */}
       <ul>
-        {players.length > 0 ? players.map((player: any, index) => (
-          <li key={player._id}>
-            <strong>{player.name ? player.name : "Missing Name"}</strong> - {player.university ? player.university : "Missing University"} ({player.category ? player.category : "Missing Category"})
+        {players.map((player) => (
+          <li key={player._id} style={{ margin: "10px 0" }}>
+            <strong>{player.name}</strong> - {player.university} ({player.category})
             <br />
-            🏏 <b>Runs:</b> {player.runs ?? 0} | 🎯 <b>Wickets:</b> {player.wickets ?? 0} | ⚡ <b>SR:</b> {player.ballsFaced > 0 ? ((player.runs / player.ballsFaced) * 100).toFixed(2) : "N/A"}
+            Runs: {player.runs} | Wickets: {player.wickets}
             <br />
-            🏆 <b>Points:</b> {player.playerPoints ?? 0} | 💰 <b>Value:</b> Rs.{(player.playerValue ?? 0).toLocaleString()}
-            <br />
-            <button onClick={() => addToTeam(player)}>Add</button>
-          </li>
-        )) : <p>No players found.</p>}
-      </ul>
-
-      {/* Selected Team Display */}
-      <h3>Your Team:</h3>
-      <ul>
-        {team.map((player: any) => (
-          <li key={player._id}>
-            {player.name} - {player.category}
+            <button onClick={() => addPlayer(player)}>Add</button>
           </li>
         ))}
       </ul>
+
+      <h3>Your Team</h3>
+      <ul>
+        {team.map((p) => (
+          <li key={p._id} style={{ margin: "10px 0" }}>
+            {p.name} ({p.category})
+            <button onClick={() => removePlayer(p._id)}>Remove</button>
+          </li>
+        ))}
+      </ul>
+
+      {/* “Save Team” button */}
+      <button
+        onClick={saveTeam}
+        disabled={team.length !== 11}
+        style={{ marginRight: "10px" }}
+      >
+        Save Team
+      </button>
+
+      {/* “View Team” button */}
+      <button onClick={() => router.push("/team")}>View Team</button>
     </div>
   );
 }
