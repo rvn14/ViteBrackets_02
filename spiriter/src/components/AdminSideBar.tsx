@@ -100,7 +100,7 @@ export default function AdminSidebar() {
       <div className="border-t border-white/10 pt-4">
         <button
           onClick={handleLogout}
-          className="w-full mt-4 px-3 py-2 bg-red-500/80 text-white rounded hover:bg-red-600 transition-colors"
+          className="w-full mt-4 px-3 py-2 bg-red-500/80 text-white rounded hover:bg-red-600 transition-colors cursor-pointer"
         >
           Logout
         </button>
