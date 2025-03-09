@@ -11,6 +11,7 @@ export async function POST() {
     path: '/',
     maxAge: 0, // Expire immediately
   });
+  cookieStore.delete('token');
 
   return NextResponse.json({ message: 'Logged out successfully' }, { status: 200 });
 }
