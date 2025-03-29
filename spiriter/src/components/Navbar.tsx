@@ -53,6 +53,7 @@ const Navbar = () => {
 
       if (response.ok) {
         setIsLogged(false);
+        window.location.href = "/auth/login"; // Redirect to login page
       } else {
         console.error("Logout failed:", response.statusText);
       }
