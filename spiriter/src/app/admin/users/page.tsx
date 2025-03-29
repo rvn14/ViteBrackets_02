@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import swal from "sweetalert"; // Imported swal for confirmation dialogs
+import { FaChevronLeft, FaChevronRight, FaTrash } from "react-icons/fa"; // Imported bin icon
 
 interface User {
   _id: string;
@@ -58,11 +59,12 @@ export default function ManageUsers() {
     fetchCurrentUser();
   }, []);
 
-  // Promote or Demote User
+  // Toggle admin status (no confirmation here; see confirmToggleAdminStatus below)
   const toggleAdminStatus = async (userId: string) => {
     try {
+      // Prevent modifying your own status
       if (currentUser?._id === userId) {
-        toast.error("You cannot change your own admin status!");
+        swal("Error", "You cannot change your own admin status!", "error");
         return;
       }
 
@@ -72,7 +74,7 @@ export default function ManageUsers() {
       });
 
       if (!response.ok) {
-        toast.error("Failed to update user role");
+        swal("Error", "Failed to update user role", "error");
         return;
       }
 
@@ -81,11 +83,71 @@ export default function ManageUsers() {
       setUsers((prev) =>
         prev.map((u) => (u._id === userId ? { ...u, isAdmin: !u.isAdmin } : u))
       );
-      toast.success(data.message);
+      swal("Success", data.message, "success");
     } catch (error) {
       console.error("Error updating user role:", error);
-      toast.error("Error updating user role");
+      swal("Error", "Error updating user role", "error");
     }
+  };
+
+  // Confirmation for toggling admin status
+  const confirmToggleAdminStatus = (userId: string) => {
+    const user = users.find((u) => u._id === userId);
+    if (!user) return;
+    const actionText = user.isAdmin ? "Demote to User" : "Make Admin";
+    swal({
+      title: "Confirm Role Change",
+      text: `Are you sure you want to ${actionText} for ${user.username}?`,
+      icon: "info",
+      buttons: {
+        deny: { text: "Cancel", value: false },
+        confirm: { text: actionText, value: true },
+      },
+      dangerMode: false,
+    }).then((willConfirm) => {
+      if (willConfirm) {
+        toggleAdminStatus(userId);
+      }
+    });
+  };
+
+  // Delete user function
+  const deleteUser = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/admin/users/${userId}/role`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        swal("Error", "Failed to remove user", "error");
+        return;
+      }
+      // Update the local state by filtering out the deleted user
+      setUsers((prev) => prev.filter((user) => user._id !== userId));
+      swal("Deleted", "User removed successfully", "success");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      swal("Error", "An error occurred while deleting the user", "error");
+    }
+  };
+
+  // Confirmation for deleting a user using the bin icon
+  const confirmDeleteUser = (userId: string) => {
+    swal({
+      title: "Delete User",
+      text: "Are you sure you want to remove this user? This action cannot be undone.",
+      icon: "warning",
+      buttons: {
+        deny: { text: "Cancel", value: false },
+        confirm: { text: "Delete", value: true },
+      },
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        deleteUser(userId);
+      }
+    });
   };
 
   if (loading) {
@@ -123,9 +185,10 @@ export default function ManageUsers() {
                 </td>
                 <td className="p-4 border-white/5">
                   {currentUser?._id !== user._id ? (
-                    <div className="flex justify-center">
+                    <div className="flex justify-center gap-2">
+                      {/* Toggle admin button with confirmation */}
                       <button
-                        onClick={() => toggleAdminStatus(user._id)}
+                        onClick={() => confirmToggleAdminStatus(user._id)}
                         className={`w-40 px-3 py-1 rounded font-semibold transition-colors bg-gradient-to-r ${
                           user.isAdmin
                             ? "from-red-500/80 to-red-600/80 hover:from-red-600 hover:to-red-700"
@@ -133,6 +196,13 @@ export default function ManageUsers() {
                         } text-white backdrop-blur-md bg-white/20`}
                       >
                         {user.isAdmin ? "Demote to User" : "Make Admin"}
+                      </button>
+                      {/* Delete button with bin icon and swal confirmation */}
+                      <button
+                        onClick={() => confirmDeleteUser(user._id)}
+                        className="p-2 rounded bg-red-600 hover:bg-red-700 transition-colors"
+                      >
+                        <FaTrash size={20} />
                       </button>
                     </div>
                   ) : (

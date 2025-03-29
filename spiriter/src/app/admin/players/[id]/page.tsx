@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import swal from "sweetalert";
 
 export default function PlayerDetailPage() {
   const router = useRouter();
@@ -26,7 +27,6 @@ export default function PlayerDetailPage() {
         setLoading(false);
       }
     }
-
     fetchPlayer();
   }, [id]);
 
@@ -40,7 +40,7 @@ export default function PlayerDetailPage() {
     });
   };
 
-  // Save edited player details
+  // Save edited player details (API call)
   const handleSave = async () => {
     try {
       const response = await fetch(`/api/admin/players/${id}`, {
@@ -50,35 +50,38 @@ export default function PlayerDetailPage() {
       });
 
       if (response.ok) {
-        alert("Player updated successfully!");
+        swal("Success", "Player updated successfully!", "success");
         setIsEditing(false);
         // Update original copy with new data
         setOriginalPlayer(player);
       } else {
+        swal("Error", "Failed to update player", "error");
         console.error("Failed to update player");
       }
     } catch (error) {
       console.error("Error updating player:", error);
+      swal("Error", "Error updating player", "error");
     }
   };
 
-  // Delete player & navigate back
+  // Delete player (API call)
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this player?")) return;
-
     try {
       const response = await fetch(`/api/admin/players/${id}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
-        alert("Player deleted successfully!");
-        router.push("/admin/players"); // Redirect back to players list
+        swal("Deleted", "Player deleted successfully!", "success").then(() => {
+          router.push("/admin/players"); // Redirect back to players list
+        });
       } else {
+        swal("Error", "Failed to delete player", "error");
         console.error("Failed to delete player");
       }
     } catch (error) {
       console.error("Error deleting player:", error);
+      swal("Error", "Error deleting player", "error");
     }
   };
 
@@ -89,6 +92,77 @@ export default function PlayerDetailPage() {
     setIsEditing(false);
   };
 
+  // Confirmation for entering edit mode
+  const handleEdit = () => {
+    swal({
+      title: "Enter Edit Mode",
+      text: "Do you want to edit this player's details?",
+      icon: "info",
+      buttons: {
+        deny: { text: "No", value: false },
+        confirm: { text: "Yes", value: true },
+      },
+      dangerMode: false,
+    }).then((willEdit) => {
+      if (willEdit) {
+        setIsEditing(true);
+      }
+    });
+  };
+
+  // Confirmation for saving changes
+  const handleSaveEdit = () => {
+    swal({
+      title: "Save Changes",
+      text: "Are you sure you want to save these changes?",
+      icon: "info",
+      buttons: {
+        deny: { text: "Cancel", value: false },
+        confirm: { text: "Save", value: true },
+      },
+      dangerMode: false,
+    }).then((willSave) => {
+      if (willSave) {
+        handleSave();
+      }
+    });
+  };
+
+  // Confirmation for canceling editing
+  const handleCancelEdit = () => {
+    swal({
+      title: "Cancel Editing",
+      text: "Are you sure you want to cancel editing? All unsaved changes will be lost.",
+      icon: "warning",
+      buttons: {
+        deny: { text: "No", value: false },
+        confirm: { text: "Yes", value: true },
+      },
+      dangerMode: true,
+    }).then((willCancel) => {
+      if (willCancel) {
+        handleCancel();
+      }
+    });
+  };
+
+  // Confirmation for deleting player
+  const confirmDelete = () => {
+    swal({
+      title: "Delete Player",
+      text: "Are you sure you want to delete this player? This action cannot be undone.",
+      icon: "warning",
+      buttons: {
+        deny: { text: "Cancel", value: false },
+        confirm: { text: "Delete", value: true },
+      },
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        handleDelete();
+      }
+    });
+  }
   if (loading) return <p>Loading...</p>;
   if (!player) return <p>Player not found.</p>;
 
@@ -104,11 +178,11 @@ export default function PlayerDetailPage() {
 
       {/* Editable Fields */}
       <div className="space-y-2">
-        <label className="block ">
+        <label className="block">
           <span className="text-white/80">Name:</span>
           <input
             type="text"
-            name="Name"
+            name="name"
             value={player.name}
             onChange={handleChange}
             disabled={!isEditing}
@@ -122,7 +196,7 @@ export default function PlayerDetailPage() {
           <span className="text-white/80">University:</span>
           <input
             type="text"
-            name="University"
+            name="university"
             value={player.university}
             onChange={handleChange}
             disabled={!isEditing}
@@ -170,23 +244,21 @@ export default function PlayerDetailPage() {
         </div>
         {/* Actions */}
         <div className="flex items-center justify-center gap-4 mt-4">
-          {isEditing && (
+          {isEditing ? (
             <>
-              <button onClick={handleCancel} className="px-8 py-2 bg-blue-500 text-white rounded cursor-pointer">
+              <button onClick={handleCancelEdit} className="px-8 py-2 bg-blue-500 text-white rounded cursor-pointer">
                 Cancel
               </button>
-              <button onClick={handleSave} className="px-8 py-2 bg-green-600 text-white rounded cursor-pointer">
+              <button onClick={handleSaveEdit} className="px-8 py-2 bg-green-600 text-white rounded cursor-pointer">
                 Save
               </button>
             </>
-          )}
-
-          {!isEditing && (
+          ) : (
             <>
-              <button onClick={() => setIsEditing(true)} className="px-8 py-2 bg-blue-500 text-white rounded cursor-pointer">
+              <button onClick={handleEdit} className="px-8 py-2 bg-blue-500 text-white rounded cursor-pointer">
                 Edit
               </button>
-              <button onClick={handleDelete} className="px-8 py-2 bg-red-600 text-white rounded cursor-pointer">
+              <button onClick={confirmDelete} className="px-8 py-2 bg-red-600 text-white rounded cursor-pointer">
                 Delete
               </button>
               <button onClick={() => router.push("/admin/players")} className="px-8 py-2 bg-gray-500 text-white rounded cursor-pointer">
