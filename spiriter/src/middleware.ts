@@ -13,6 +13,9 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
+    if (!token) {
+      throw new Error("Token is missing");
+    }
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
     const isAdmin = payload.isAdmin;

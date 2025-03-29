@@ -5,6 +5,9 @@ import { connectToDatabase } from "@/lib/mongodb";
 import mongoose from "mongoose";
 import User from "@/models/User";
 import Player from "@/models/Player";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
+import { calculateDerivedAttributes } from "@/lib/calculateDerivedAttributes";
 
 // GET /api/teams/[id]: Return the user's team
 export async function GET(
@@ -21,13 +24,53 @@ export async function GET(
 
     console.log("Fetching team for user:", userId);
 
-    const user = await User.findById(userId).populate("team");
-    if (!user || !user.team) {
+    // Get the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    // If user has no team or team is empty, return empty array
+    if (!user.team || user.team.length === 0) {
       return NextResponse.json({ players: [] }, { status: 200 });
     }
 
-    // Return the user's team array
-    return NextResponse.json({ players: user.team }, { status: 200 });
+    // Explicitly fetch complete player details for each player ID in the team
+    const fullPlayerDetails = await Player.find({
+      _id: { $in: user.team }
+    });
+    const result = fullPlayerDetails.map((p) => {
+      const derived = calculateDerivedAttributes({
+      totalRuns: p["Total Runs"] || 0,
+      totalBallsFaced: p["Balls Faced"] || 0,
+      inningsPlayed: p["Innings Played"] || 0,
+      totalWicketsTaken: p["Wickets"] || 0,
+      totalBallsBowled: p["Overs Bowled"] || 0,
+      totalRunsConceded: p["Runs Conceded"] || 0,
+      });
+
+      return {
+      _id: p._id,
+      name: p.Name,
+      university: p.University,
+      category: p.Category,
+
+      runs: p["Total Runs"] || 0,
+      ballsFaced: p["Balls Faced"] || 0,
+      inningsPlayed: p["Innings Played"] || 0,
+      wickets: p.Wickets || 0,
+      oversBowled: p["Overs Bowled"] || 0,
+      runsConceded: p["Runs Conceded"] || 0,
+      battingStrikeRate: derived.battingStrikeRate,
+      battingAverage: derived.battingAverage,
+      bowlingStrikeRate: derived.bowlingStrikeRate,
+      economyRate: derived.economyRate,
+      playerPoints: derived.playerPoints,
+      playerValue: derived.playerValue,
+      };
+    });
+
+    return NextResponse.json({ players: result }, { status: 200 });
   } catch (error: any) {
     console.error("❌ Error fetching team:", error.message);
     return NextResponse.json(
@@ -36,6 +79,8 @@ export async function GET(
     );
   }
 }
+
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 // POST /api/teams/[id]: Save or update user's team & adjust budget
 export async function POST(
@@ -52,13 +97,15 @@ export async function POST(
 
     // Parse the request body: { players: [...], totalPoints: number }
     const body = await request.json();
-    const { players, totalPoints } = body;
+    const { players, totalPoints, budget } = body;
 
     console.log(
       "Received team save request => players:",
       players,
       " totalPoints:",
-      totalPoints
+      totalPoints,
+      " budget:",
+      budget
     );
 
     if (!Array.isArray(players)) {
@@ -68,12 +115,12 @@ export async function POST(
       );
     }
 
-    // Find all the new team players in DB
-    const validPlayers = await Player.find({ _id: { $in: players } });
+    // Fetch all the player objects from the database based on the provided IDs
+    const validPlayers = await Player.find({ _id: { $in: players } }).lean();
     if (validPlayers.length !== players.length) {
       return NextResponse.json(
-        { message: "Some players not found" },
-        { status: 400 }
+      { message: "Some players not found or invalid player IDs provided" },
+      { status: 400 }
       );
     }
 
@@ -83,39 +130,39 @@ export async function POST(
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // 2) Find the old team's players (to compute old cost)
-    const oldTeamPlayers = await Player.find({ _id: { $in: user.team } });
-    const oldTeamCost = oldTeamPlayers.reduce(
-      (acc, p) => acc + (p.playerValue || 0),
-      0
-    );
-
-    // 3) Compute the new team's total cost
-    const newTeamCost = validPlayers.reduce(
-      (acc, p) => acc + (p.playerValue || 0),
-      0
-    );
-
-    // 4) Budget difference: (oldTeamCost - newTeamCost)
-    // If negative => new team is more expensive => budget goes down
-    // If positive => new team is cheaper => budget goes up
-    const costDifference = oldTeamCost - newTeamCost;
-    const updatedBudget = user.budget + costDifference;
-
-    // (Optional) If you want to prevent budget going below 0:
-    // if (updatedBudget < 0) {
-    //   return NextResponse.json({ message: "Insufficient budget" }, { status: 400 });
-    // }
-
-    user.budget = updatedBudget;
+    user.budget = budget || user.budget; // Update budget if provided, else keep the old one
     user.team = validPlayers; // overwrite old team with new team
     user.totalPoints = totalPoints || 0;
 
+    // Update the user's cookie with new budget and total points
+    const token = jwt.sign(
+      { 
+        userId: user._id, 
+        username: user.username, 
+        budget: user.budget, 
+        totalPoints: user.totalPoints, 
+        isAdmin: user.isAdmin 
+      },
+      JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+
+    const cookieStore = await cookies();
+    cookieStore.set({
+      name: 'token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 86400, // 1 day
+    });
+
+    // Save the user ONCE after all changes
     await user.save();
 
-    console.log(
-      `✅ Team updated. OldCost=${oldTeamCost}, NewCost=${newTeamCost}, Budget=${user.budget}`
-    );
+    // console.log(
+    //   `✅ Team updated. OldCost=${oldTeamCost}, NewCost=${newTeamCost}, Budget=${user.budget}`
+    // );
 
     return NextResponse.json(
       {
