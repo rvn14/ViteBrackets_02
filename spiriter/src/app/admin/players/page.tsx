@@ -63,7 +63,7 @@ export default function PlayersPage() {
   const [filterCategory, setFilterCategory] = useState("");
   const [filterUniversity, setFilterUniversity] = useState("");
 
-  const [valueRange, setValueRange] = useState<[number, number]>([0, 1000000]);
+  const [valueRange, setValueRange] = useState<[number, number]>([0, Infinity]);
 
   // ** Apply Filters When Inputs Change **
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function PlayersPage() {
   return (
     <div className="p-4 text-white">
       {/* Search & Filters */}
-      <h1 className="text-4xl font-black text-white text-center mb-6">ALL players</h1>
+      <h1 className="text-4xl font-black text-white text-center mb-6">All Players</h1>
 
       {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-4 mb-8">
