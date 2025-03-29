@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
 import { jwtVerify } from "jose/jwt/verify";
 
 export async function middleware(request: NextRequest) {
@@ -24,7 +23,7 @@ export async function middleware(request: NextRequest) {
     // Admin Protection
     if (request.nextUrl.pathname.startsWith("/admin") && !isAdmin) {
       console.log("❌ Access Denied: User is not an admin.");
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     console.log("✅ Access Granted");
