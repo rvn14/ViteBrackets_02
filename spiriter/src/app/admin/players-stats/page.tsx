@@ -9,7 +9,7 @@ export default function PlayerStatsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterUniversity, setFilterUniversity] = useState("");
-  const [valueRange, setValueRange] = useState<[number, number]>([0, 1000000]);
+  const [valueRange, setValueRange] = useState<[number, number]>([0, Infinity]);
 
   useEffect(() => {
     async function fetchPlayers() {

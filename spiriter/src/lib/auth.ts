@@ -2,13 +2,21 @@ import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
 
 export function verifyAuthHeader(request: NextRequest) {
-  const header = request.headers.get('authorization');
+  let token: string | undefined;
 
-  if (!header || !header.startsWith('Bearer ')) {
+  // Check for Authorization header
+  const header = request.headers.get('authorization');
+  if (header && header.startsWith('Bearer ')) {
+    token = header.split(' ')[1];
+  } else {
+    // Fallback: get token from cookies
+    token = request.cookies.get('token')?.value;
+  }
+
+  if (!token) {
     throw new Error('Unauthorized: No token provided');
   }
 
-  const token = header.split(' ')[1];
   const secret = process.env.JWT_SECRET;
   if (!secret) {
     throw new Error('Server error: JWT_SECRET is missing');
@@ -16,7 +24,7 @@ export function verifyAuthHeader(request: NextRequest) {
 
   try {
     const decoded = jwt.verify(token, secret);
-    return decoded; // Now includes { id, isAdmin }
+    return decoded; // Expected to include { id, isAdmin }
   } catch (error) {
     throw new Error('Unauthorized: Invalid token');
   }

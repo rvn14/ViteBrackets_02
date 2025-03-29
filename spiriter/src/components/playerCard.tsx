@@ -33,7 +33,6 @@ export interface Player {
 
 interface PlayerCardProps {
   player: Player;
-
 }
 
 export default function PlayerCard({ player }: PlayerCardProps) {
@@ -42,10 +41,6 @@ export default function PlayerCard({ player }: PlayerCardProps) {
 
   return (
     <div className="relative w-full h-[300px] bg-white/10 text-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center justify-center p-8">
-      {/* 
-        Top-left plus icon => Hover to show expanded stats 
-        group + group-hover classes let you show the stats on hover 
-      */}
       <div className="absolute top-4 left-4">
         <div className="relative group">
           {/* The plus icon */}
