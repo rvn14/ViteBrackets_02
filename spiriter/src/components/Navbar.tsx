@@ -53,6 +53,7 @@ const Navbar = () => {
 
       if (response.ok) {
         setIsLogged(false);
+        window.location.href = "/auth/login"; // Redirect to login page
       } else {
         console.error("Logout failed:", response.statusText);
       }
@@ -137,7 +138,7 @@ const Navbar = () => {
             <button
               ref={buttonRef}
               onClick={toggleMobileMenu}
-              className="text-white p-2 rounded-md hover:bg-gray-700"
+              className="text-white p-2 rounded-md hover:bg-white/40"
             >
               {isMobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -151,8 +152,9 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div ref={mobileMenuRef} className="md:hidden backdrop-blur-xs bg-black/50">
-          <div className="px-2 pt-2 pb-3 space-y-1 text-white">
+        <div ref={mobileMenuRef} className="shadow-2xs w-full backdrop-blur-3xl z-40 bg-[#000018]/90">
+          
+          <div className="px-2 pt-2 pb-3 space-y-1 text-white z-50">
             <div className="flex flex-col space-y-4 p-4">
               <NavLinks />
               {isLogged ? (

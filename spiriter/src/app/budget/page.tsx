@@ -104,59 +104,15 @@ export default function TeamPage() {
   }, [team]);
 
   // Function to remove a player from the team
-  const removePlayer = async (playerId: string) => {
-    if (!userData?.userId) {
-      setError("User not found. Please log in again.");
-      return;
-    }
-
-    try {
-      // Remove player from local state first for immediate UI feedback
-      const playerToRemove = team.find((p) => p._id === playerId);
-      if (!playerToRemove) return;
-
-      const newTeam = team.filter((p) => p._id !== playerId);
-      setTeam(newTeam);
-
-      // Calculate new points total
-      const newTotalPoints = newTeam.reduce(
-        (total, player) => total + (player.playerPoints || 0),
-        0
-      );
-
-      // Update budget: Add back the removed player's value
-      const updatedBudget = userData.budget + (playerToRemove.playerValue || 0);
-
-      // Send the updated team to the server
-      await axios.post(`/api/teams/${userData.userId}`, {
-        players: newTeam.map((p) => p._id),
-        totalPoints: newTotalPoints,
-        budget: updatedBudget,
-      });
-
-      // Update user data state with new budget
-      setUserData({
-        ...userData,
-        budget: updatedBudget,
-      });
-    } catch (err) {
-      console.error("Error removing player:", err);
-      setError("Failed to update team. Please try again.");
-
-      // Fetch the team again to reset the state
-      const res = await axios.get(`/api/teams/${userData.userId}`);
-      if (res.data.players) {
-        setTeam(res.data.players);
-      }
-    }
-  };
+  
 
   return (
-    <div className="min-h-screen w-full bg-[#000018] px-4 sm:px-6 lg:px-8">
+    <div className="budget min-h-screen w-full bg-[#000018] px-4 sm:px-6 lg:px-8">
+      <div className="gradDot fixed top-0 rounded-full w-1/2 h-[500px] bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0"></div>
       {/* Updated background effect */}
-      <div className="fixed top-0 left-0 right-0 h-[500px] bg-gradient-to-r from-blue-500 to-indigo-600 blur-[150px] -z-10"></div>
+      <div className="fixed top-0 left-0 right-0 h-[500px] blur-[150px] -z-10"></div>
 
-      <div className="relative z-10 max-w-5xl mx-auto py-10">
+      <div className="relative z-10 max-w-5xl mx-auto py-10 mt-16">
         <h1 className="text-4xl font-extrabold text-white mb-8 text-center">
           Team & Budget Overview
         </h1>

@@ -13,7 +13,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
 
   return (
     // <ReactLenis root>
-    <div className="">
+    <div className="overflow-x-hidden w-full ">
       {show && <Navbar />}
       {show && (<ChatBot />)}
       {children}
