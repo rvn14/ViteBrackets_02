@@ -1,56 +1,180 @@
-"use client"
+"use client";
 
-import Link from 'next/link'
-
-import React, { useEffect, useState } from 'react'
+import Link from "next/link";
+import React, { useEffect, useState, useRef } from "react";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
-  const [isLogged, setIsLogged] = useState(false)
+  const [isLogged, setIsLogged] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    
     async function fetchUser() {
       try {
         const response = await fetch("/api/auth/me");
         if (response.ok) {
-          setIsLogged(true)
+          setIsLogged(true);
           return;
         }
-
-      }
-        catch (error) {
+      } catch (error) {
         console.error("Error fetching user:", error);
-
       }
     }
 
     fetchUser();
-    
-  }, [])
-  
+  }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        mobileMenuRef.current &&
+        buttonRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node) &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        setIsLogged(false);
+      } else {
+        console.error("Logout failed:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+    setIsMobileMenuOpen(false);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleLinkClick = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  const NavLinks = () => (
+    <>
+      <Link href="/" onClick={handleLinkClick}>
+        <div className="cursor-pointer rounded-3xl nav-hover-btn">
+          Home
+        </div>
+      </Link>
+      <Link href="/leaderboard" onClick={handleLinkClick}>
+        <div className="cursor-pointer rounded-3xl nav-hover-btn">
+          Leaderboard
+        </div>
+      </Link>
+      <Link href="/players" onClick={handleLinkClick}>
+        <div className="cursor-pointer rounded-3xl nav-hover-btn">
+          Players
+        </div>
+      </Link>
+      {isLogged && (
+        <>
+          <Link href="/team" onClick={handleLinkClick}>
+            <div className="cursor-pointer rounded-3xl nav-hover-btn">
+              Your Team
+            </div>
+          </Link>
+          <Link href="/budget" onClick={handleLinkClick}>
+            <div className="cursor-pointer rounded-3xl nav-hover-btn">
+              Budget
+            </div>
+          </Link>
+        </>
+      )}
+    </>
+  );
 
   return (
-    <div className='fixed w-screen h-24 z-40 flex justify-center items-center backdrop-blur-xs shadow-2xs '>
-            
-        <div className='w-full h-full flex justify-center items-center text-white gap-16 lg:gap-128 '>
-            <div className='flex justify-between items-center'>
-                <img className='h-8' src="/images/logo-hor.png" alt=""/>
-            </div>
-            {isLogged?<div className='flex items-center gap-8'>
-                <Link href="/"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Home</div></Link>
-                <Link href="/leaderboard"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Leaderboard</div></Link>
-                <Link href="/team"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Your Team</div></Link>
-                <Link href="/auth/login"><div className='cursor-pointer py-2 px-6 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500'>Logout</div></Link>
-                
-            </div>:<div className='flex items-center gap-8'>
-                <Link href="/"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Home</div></Link>
-                <Link href="/leaderboard"><div className='cursor-pointer rounded-3xl nav-hover-btn'>Leaderboard</div></Link>
-                <Link href="/auth/signup"><div className='cursor-pointer py-2 px-6 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500'>Sign Up</div></Link>
-                </div>}
-        </div>
-    </div>
-  )
-}
+    <nav className="fixed top-0 w-full h-24 z-40 backdrop-blur-xs shadow-2xs">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex justify-between items-center h-full">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <img className="h-8" src="/images/logo-hor.png" alt="Logo" />
+          </div>
 
-export default Navbar
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8 text-white">
+            <NavLinks />
+            {isLogged ? (
+              <button
+                onClick={handleLogout}
+                className="cursor-pointer py-2 px-6 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link href="/auth/signup" onClick={handleLinkClick}>
+                <div className="cursor-pointer py-2 px-6 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity">
+                  Sign Up
+                </div>
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              ref={buttonRef}
+              onClick={toggleMobileMenu}
+              className="text-white p-2 rounded-md hover:bg-gray-700"
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      {isMobileMenuOpen && (
+        <div ref={mobileMenuRef} className="md:hidden backdrop-blur-xs bg-black/50">
+          <div className="px-2 pt-2 pb-3 space-y-1 text-white">
+            <div className="flex flex-col space-y-4 p-4">
+              <NavLinks />
+              {isLogged ? (
+                <button
+                  onClick={handleLogout}
+                  className="cursor-pointer py-2 px-6 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity text-center"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link href="/auth/signup" onClick={handleLinkClick}>
+                  <div className="cursor-pointer py-2 px-6 rounded-3xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity text-center">
+                    Sign Up
+                  </div>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default Navbar;
