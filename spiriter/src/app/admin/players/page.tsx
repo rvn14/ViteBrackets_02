@@ -110,7 +110,7 @@ export default function PlayersPage() {
           <option value="">All Categories</option>
           <option value="Batsman">Batsman</option>
           <option value="Bowler">Bowler</option>
-          <option value="All-rounder">All-rounder</option>
+          <option value="All-Rounder">All-Rounder</option>
         </select>
         {/* University Filter */}
         <input

@@ -140,19 +140,28 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await connectToDatabase();
+    console.log('Received DELETE request for player ID:', params.id);
 
     // Check if user is an admin
-    const payload = await verifyAuthHeader(request);
-    if (typeof payload !== 'string' && 'id' in payload) {
-      const user = await User.findById(payload.id);
-      if (!user || user.username !== 'admin') {
+    const payload = verifyAuthHeader(request);
+    console.log('Payload:', payload);
+
+    if (typeof payload !== 'string' && 'userId' in payload) {
+      const user = await User.findById(payload.userId);
+      console.log('Payload:', payload);
+
+      console.log('User:', user);
+      if (!user || user.isAdmin !== true) {
+        console.log('User is not an admin');
         return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
       }
     } else {
+      console.log('Invalid token or payload');
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
     const deletedPlayer = await Player.findByIdAndDelete(params.id);
+
     if (!deletedPlayer) {
       return NextResponse.json({ message: 'Player not found' }, { status: 404 });
     }

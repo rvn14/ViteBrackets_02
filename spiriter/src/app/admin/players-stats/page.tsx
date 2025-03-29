@@ -71,7 +71,7 @@ export default function PlayerStatsPage() {
           <option value="">All Categories</option>
           <option value="Batsman">Batsman</option>
           <option value="Bowler">Bowler</option>
-          <option value="All-rounder">All-rounder</option>
+          <option value="All-rounder">All-Rounder</option>
         </select>
         {/* University Filter */}
         <input
