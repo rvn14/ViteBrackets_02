@@ -10,7 +10,7 @@ export default function AddPlayerPage() {
   // Player fields
   const [name, setName] = useState("");
   const [university, setUniversity] = useState("");
-  const [category, setCategory] = useState<"Batsman" | "Bowler" | "All-rounder">("Batsman");
+  const [category, setCategory] = useState<"Batsman" | "Bowler" | "All-Rounder">("Batsman");
 
   // Stats fields
   const [runs, setRuns] = useState(0);
@@ -46,8 +46,9 @@ export default function AddPlayerPage() {
       const res = await fetch("/api/admin/players", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",  // ensures cookies are sent
         body: JSON.stringify(playerData),
-      });
+    });
 
       if (!res.ok) throw new Error("Failed to add player");
 

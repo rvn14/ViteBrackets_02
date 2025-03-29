@@ -7,6 +7,7 @@ export default function PlayerDetailPage() {
   const router = useRouter();
   const { id } = useParams(); // Get player ID from URL
   const [player, setPlayer] = useState<any>(null);
+  const [originalPlayer, setOriginalPlayer] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -18,6 +19,7 @@ export default function PlayerDetailPage() {
         const data = await response.json();
         console.log("Fetched Player:", data);
         setPlayer(data);
+        setOriginalPlayer(data); // store the original copy
       } catch (error) {
         console.error("Error fetching player details:", error);
       } finally {
@@ -30,7 +32,12 @@ export default function PlayerDetailPage() {
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setPlayer({ ...player, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const numberFields = ["runs", "ballsFaced", "inningsPlayed", "wickets", "oversBowled", "runsConceded"];
+    setPlayer({
+      ...player,
+      [name]: numberFields.includes(name) ? Number(value) : value,
+    });
   };
 
   // Save edited player details
@@ -45,6 +52,8 @@ export default function PlayerDetailPage() {
       if (response.ok) {
         alert("Player updated successfully!");
         setIsEditing(false);
+        // Update original copy with new data
+        setOriginalPlayer(player);
       } else {
         console.error("Failed to update player");
       }
@@ -73,13 +82,18 @@ export default function PlayerDetailPage() {
     }
   };
 
+  // Cancel editing and revert changes
+  const handleCancel = () => {
+    // Revert player details to original copy and disable editing
+    setPlayer(originalPlayer);
+    setIsEditing(false);
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!player) return <p>Player not found.</p>;
 
   return (
     <div className="p-6 max-w-2xl mx-auto bg-white/10 border-1 border-white/20 backdrop-blur-lg shadow-md rounded-lg">
-
-      {/* Header Image */}
       <img
         src="https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png"
         alt="Players Icon"
@@ -95,11 +109,12 @@ export default function PlayerDetailPage() {
           <input
             type="text"
             name="Name"
-
             value={player.name}
             onChange={handleChange}
             disabled={!isEditing}
-            className={`w-full p-2 rounded outline-0 text-white ${isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"}`}
+            className={`w-full p-2 rounded outline-0 text-white ${
+              isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"
+            }`}
           />
         </label>
 
@@ -111,7 +126,9 @@ export default function PlayerDetailPage() {
             value={player.university}
             onChange={handleChange}
             disabled={!isEditing}
-            className={`w-full p-2 rounded outline-0 text-white ${isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"}`}
+            className={`w-full p-2 rounded outline-0 text-white ${
+              isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"
+            }`}
           />
         </label>
 
@@ -122,20 +139,20 @@ export default function PlayerDetailPage() {
             value={player.category}
             onChange={handleChange}
             disabled={!isEditing}
-            className={`w-full p-2 rounded outline-0 text-white ${isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"}`}
+            className={`w-full p-2 rounded outline-0 text-white ${
+              isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"
+            }`}
           >
             <option value="Batsman">Batsman</option>
             <option value="Bowler">Bowler</option>
-            <option value="All-rounder">All-rounder</option>
+            <option value="All-rounder">All-Rounder</option>
           </select>
         </label>
 
         {/* Stats Section */}
         <h2 className="text-lg font-semibold mt-4 text-white">Statistics</h2>
         <div className="grid grid-cols-2 gap-2">
-
-        {["runs", "ballsFaced", "inningsPlayed", "wickets", "oversBowled", "runsConceded"].map(
-          (stat) => (
+          {["runs", "ballsFaced", "inningsPlayed", "wickets", "oversBowled", "runsConceded"].map((stat) => (
             <label key={stat} className="block">
               <span className="text-white/80 capitalize">{stat.replace(/([A-Z])/g, " $1")}:</span>
               <input
@@ -144,43 +161,39 @@ export default function PlayerDetailPage() {
                 value={player[stat]}
                 onChange={handleChange}
                 disabled={!isEditing}
-                className={`w-full p-2 rounded outline-0 text-white ${isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"}`}
+                className={`w-full p-2 rounded outline-0 text-white ${
+                  isEditing ? "bg-white/10 border-2 border-white/20" : "bg-white/20"
+                }`}
               />
             </label>
-          )
-        )}
+          ))}
         </div>
         {/* Actions */}
         <div className="flex items-center justify-center gap-4 mt-4">
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="px-8 py-2 bg-blue-500 text-white rounded cursor-pointer"
-          >
-            {isEditing ? "Cancel" : "Edit"}
-          </button>
-
           {isEditing && (
-            <button
-              onClick={handleSave}
-              className="px-8 py-2 bg-green-600 text-white rounded cursor-pointer"
-            >
-              Save
-            </button>
+            <>
+              <button onClick={handleCancel} className="px-8 py-2 bg-blue-500 text-white rounded cursor-pointer">
+                Cancel
+              </button>
+              <button onClick={handleSave} className="px-8 py-2 bg-green-600 text-white rounded cursor-pointer">
+                Save
+              </button>
+            </>
           )}
 
-          <button
-            onClick={handleDelete}
-            className="px-8 py-2 bg-red-600 text-white rounded cursor-pointer"
-          >
-            Delete
-          </button>
-
-          <button
-            onClick={() => router.push("/admin/players")}
-            className="px-8 py-2 bg-gray-500 text-white rounded cursor-pointer"
-          >
-            Back
-          </button>
+          {!isEditing && (
+            <>
+              <button onClick={() => setIsEditing(true)} className="px-8 py-2 bg-blue-500 text-white rounded cursor-pointer">
+                Edit
+              </button>
+              <button onClick={handleDelete} className="px-8 py-2 bg-red-600 text-white rounded cursor-pointer">
+                Delete
+              </button>
+              <button onClick={() => router.push("/admin/players")} className="px-8 py-2 bg-gray-500 text-white rounded cursor-pointer">
+                Back
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
