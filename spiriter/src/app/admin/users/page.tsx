@@ -198,11 +198,11 @@ export default function ManageUsers() {
                         {user.isAdmin ? "Demote to User" : "Make Admin"}
                       </button>
                       {/* Delete button with bin icon and swal confirmation */}
-                      <button
+                        <button
                         onClick={() => confirmDeleteUser(user._id)}
-                        className="p-2 rounded bg-red-600 hover:bg-red-700 transition-colors"
+                        className="p-2 rounded transition-colors hover:bg-gray-700"
                       >
-                        <FaTrash size={20} />
+                        <FaTrash size={20} color="rgba(240,50,10,0.8)"/>
                       </button>
                     </div>
                   ) : (
