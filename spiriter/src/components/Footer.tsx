@@ -1,34 +1,31 @@
-import React from 'react'
-import Content from './Content'
+import React from "react";
+import Link from "next/link";
 
+export function Content() {
+  return (
+    <div className="bg-[#030322] py-8 px-12 h-full w-screen flex flex-col justify-between gap-8">
+      <Section />
+    </div>
+  );
+}
 
+const Section = () => {
+  return (
+    <div className="flex flex-col justify-center items-center ">
+      <img className="w-96" src="/images/logo-hor.png" alt="" />
 
-
+      <p className="text-gray-400">&copy;2025ViteBrackets.</p>
+    </div>
+  );
+};
 
 export default function Footer() {
-
   return (
-
-    <div 
-
-        className='relative h-[200px] z-20'
-
-        style={{clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)"}}
-
+    <div
+      className="relative h-[170px] z-20"
+      
     >
-
-        <div className='relative h-[calc(100vh+200px)] -top-[100vh] z-40'>
-
-            <div className='h-[200px] sticky top-[calc(100vh-200px)] text-white z-40'>
-
-            <Content />
-
-            </div>
-
-        </div>
-
+      <Content />
     </div>
-
-  )
-
+  );
 }

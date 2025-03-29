@@ -93,6 +93,15 @@ export default function AdminSidebar() {
               Manage Users
             </a>
           </li>
+          <hr className="border-white/10" />
+          <li>
+            <a
+              href="/admin/leaderboard"
+              className={linkClasses("/admin/leaderboard")}
+            >
+              Leaderboard
+            </a>
+          </li>
         </ul>
       </div>
 

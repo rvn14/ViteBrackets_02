@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { Lenis, ReactLenis, useLenis } from 'lenis/react'
 import { usePathname } from "next/navigation";
 import ChatBot from "@/components/ChatBot";
-import { useRef } from 'react';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 export default function Provider({ children }: { children: React.ReactNode }) {
 
   const pathname = usePathname();
-  const hiddenPaths = ["/auth/login", "/auth/signup"];
+  const hiddenPaths = ["/auth/login", "/auth/signup", "/", ...pathname.startsWith("/admin") ? [pathname] : []];
   const show = !hiddenPaths.includes(pathname);
 
   return (
     // <ReactLenis root>
-    <div className="">
-      {/* {show && <Navbar />} */}
+    <div className="overflow-x-hidden w-full ">
+      {show && <Navbar />}
       {show && (<ChatBot />)}
       {children}
-      {/* {show && <Footer />} */}
+      {show && <Footer />}
     </div>
     //</ReactLenis>
   );

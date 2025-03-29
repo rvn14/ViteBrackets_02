@@ -55,7 +55,7 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="min-h-screen text-white flex flex-col items-center pt-8 sm:pt-16 px-4 overflow-x-hidden lg:mt-8">
+    <div className="min-h-screen text-white flex flex-col items-center pt-4  px-4 overflow-x-hidden">
       {/* Background effect - more responsive */}
       <div className="fixed top-0 left-0 sm:left-1/4 w-full sm:w-1/2 h-[300px] sm:h-[500px] bg-[#1789DC] blur-[100px] sm:blur-[150px] transform -translate-y-1/2 z-0 rounded-full"></div>
 

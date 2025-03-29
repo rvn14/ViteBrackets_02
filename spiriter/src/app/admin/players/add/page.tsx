@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import swal from "sweetalert";
 
 export default function AddPlayerPage() {
   const router = useRouter();
@@ -10,7 +10,7 @@ export default function AddPlayerPage() {
   // Player fields
   const [name, setName] = useState("");
   const [university, setUniversity] = useState("");
-  const [category, setCategory] = useState<"Batsman" | "Bowler" | "All-rounder">("Batsman");
+  const [category, setCategory] = useState<"Batsman" | "Bowler" | "All-Rounder">("Batsman");
 
   // Stats fields
   const [runs, setRuns] = useState(0);
@@ -27,6 +27,18 @@ export default function AddPlayerPage() {
   // ** Handle Form Submission **
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Show confirmation dialog using SweetAlert
+    const willSave = await swal({
+      title: "Confirm Save",
+      text: "Are you sure you want to save this player?",
+      icon: "warning",
+      buttons: ["Cancel", "Save"],
+      dangerMode: true,
+    });
+
+    if (!willSave) return; // Exit if user cancels
+
     setLoading(true);
 
     try {
@@ -46,12 +58,13 @@ export default function AddPlayerPage() {
       const res = await fetch("/api/admin/players", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // ensures cookies are sent
         body: JSON.stringify(playerData),
       });
 
       if (!res.ok) throw new Error("Failed to add player");
 
-      alert(`Player added successfully!`);
+      alert("Player added successfully!");
       router.push("/admin/players"); // Navigate back to players list
     } catch (err: any) {
       alert(err.message);
@@ -94,7 +107,7 @@ export default function AddPlayerPage() {
           >
             <option value="Batsman">Batsman</option>
             <option value="Bowler">Bowler</option>
-            <option value="All-rounder">All-rounder</option>
+            <option value="All-rounder">All-Rounder</option>
           </select>
         </div>
 
@@ -177,9 +190,7 @@ export default function AddPlayerPage() {
         {/* Submit Button */}
         <button
           type="submit"
-          className={`bg-blue-600 text-white px-4 py-2 rounded w-full cursor-pointer ${
-            loading ? "opacity-50" : ""
-          }`}
+          className={`bg-blue-600 text-white px-4 py-2 rounded w-full cursor-pointer ${loading ? "opacity-50" : ""}`}
           disabled={loading}
         >
           {loading ? "Saving..." : "Save"}
@@ -188,4 +199,3 @@ export default function AddPlayerPage() {
     </div>
   );
 }
-

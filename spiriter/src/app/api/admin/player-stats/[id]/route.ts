@@ -10,7 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     await connectToDatabase();
 
     // Check if user is an admin
-    const payload = await verifyAuthHeader(request);
+    const payload = verifyAuthHeader(request);
     if (typeof payload === 'string' || !payload.id) {
       return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
     }
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     await connectToDatabase();
 
     // Check if user is an admin
-    const payload = await verifyAuthHeader(request);
+    const payload = verifyAuthHeader(request);
     if (typeof payload === 'string' || !payload.id) {
       return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
     }
@@ -68,7 +68,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     await connectToDatabase();
 
     // Check if user is an admin
-    const payload = await verifyAuthHeader(request);
+    const payload = verifyAuthHeader(request);
     if (typeof payload === 'string' || !payload.id) {
       return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
     }
