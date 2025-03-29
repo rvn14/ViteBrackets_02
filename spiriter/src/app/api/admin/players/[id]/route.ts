@@ -3,7 +3,6 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { verifyAuthHeader } from '@/lib/auth';
 import Player from '@/models/Player';
 import User from '@/models/User';
-import Team from '@/models/Team';
 import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 
 

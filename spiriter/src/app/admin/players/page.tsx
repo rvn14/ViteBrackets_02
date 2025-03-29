@@ -11,7 +11,6 @@ export default function PlayersPage() {
   const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
   const [user, setUser] = useState<any | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // ** Fetch Players on Mount **
   useEffect(() => {

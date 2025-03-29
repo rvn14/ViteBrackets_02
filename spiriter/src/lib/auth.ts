@@ -26,6 +26,7 @@ export function verifyAuthHeader(request: NextRequest) {
     const decoded = jwt.verify(token, secret);
     return decoded; // Expected to include { id, isAdmin }
   } catch (error) {
+    console.log(error)
     throw new Error('Unauthorized: Invalid token');
   }
 }

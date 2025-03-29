@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import {  NextResponse } from 'next/server';
 import { verifyAuthHeader } from '@/lib/auth';
-import { connectDB } from '@/lib/mongodb';
+import { connectToDatabase } from '@/lib/mongodb';
 import Player from '@/models/Player';
-import User from '@/models/User';
+
 
 export async function POST(request) {
   // Example: user asks a question about a player
   try {
-    await connectDB();
+    await connectToDatabase();
     verifyAuthHeader(request);
     const { question } = await request.json();
 
@@ -38,7 +38,7 @@ export async function POST(request) {
  */
 export async function GET(request) {
   try {
-    await connectDB();
+    await connectToDatabase();
     verifyAuthHeader(request);
 
     const players = await Player.find().sort({ points: -1 }).limit(11);

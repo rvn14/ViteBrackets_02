@@ -6,7 +6,6 @@ import PlayerCard from "@/components/playerCard";
 import PlayerStatsCard from "@/components/PlayerStatsCard";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { set } from "mongoose";
 
 type Player = {
   _id: string;
@@ -109,6 +108,7 @@ export default function SelectTeam() {
         setPlayers(processedPlayers);
       } catch (err) {
         setError("Failed to load players.");
+        console.log(err)
       } finally {
         setLoading(false);
       }
