@@ -7,12 +7,11 @@ import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 
 // GET all players (admin only)
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectToDatabase();
     // Retrieve all players
     const players = await Player.find().lean(); 
-
     if (!players || players.length === 0) {
       console.warn("⚠️ No players found in database");
       return NextResponse.json({ message: "No players found" }, { status: 404 });

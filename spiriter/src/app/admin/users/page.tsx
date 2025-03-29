@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import swal from "sweetalert"; // Imported swal for confirmation dialogs
 import { FaChevronLeft, FaChevronRight, FaTrash } from "react-icons/fa"; // Imported bin icon
@@ -13,7 +12,6 @@ interface User {
 }
 
 export default function ManageUsers() {
-  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
