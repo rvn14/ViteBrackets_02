@@ -96,8 +96,8 @@ export default function AdminSidebar() {
           <hr className="border-white/10" />
           <li>
             <a
-              href="/leaderboard"
-              className={linkClasses("/leaderboard")}
+              href="/admin/leaderboard"
+              className={linkClasses("/admin/leaderboard")}
             >
               Leaderboard
             </a>
