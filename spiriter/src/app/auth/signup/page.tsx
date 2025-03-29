@@ -3,7 +3,7 @@
 import gsap from "gsap";
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { toast, Bounce } from "react-toastify";
+import { toast, Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type PasswordStrengthProps = {
@@ -92,7 +92,6 @@ export default function SignupPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-
     // Validate in real-time
     validateField(name, value);
   };
@@ -148,6 +147,23 @@ export default function SignupPage() {
     }
   };
 
+  // ✅ Use an effect to trigger the toast when success updates.
+  useEffect(() => {
+    if (success) {
+      toast.success(success, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+    }
+  }, [success]);
+
   const PasswordStrengthDisplay: React.FC<PasswordStrengthProps> = ({
     passwordStrength,
   }) => {
@@ -179,13 +195,17 @@ export default function SignupPage() {
 
       <div className="flex items-center justify-center w-3/5 h-full z-20">
         <div className="hidden xl:flex w-full p- ">
-          <img ref={imgRef}
+          <img
+            ref={imgRef}
             className="object-center object-cover"
             src="/images/logo.png"
             alt=""
           />
         </div>
-        <div ref={formRef} className="w-full p-10 flex items-center justify-center z-10">
+        <div
+          ref={formRef}
+          className="w-full p-10 flex items-center justify-center z-10"
+        >
           <div className="w-[450px] h-[550px] bg-white/2 backdrop-blur-lg shadow-[0_5px_15px_rgba(0,0,0,0.35)] rounded-[10px] box-border py-[60px] px-[40px]">
             {/* Title */}
             <p className="text-center mt-[10px] mb-[30px] text-[28px] font-extrabold">
@@ -273,22 +293,11 @@ export default function SignupPage() {
                 Log in
               </span>
             </p>
-
-            {success &&
-              toast.success("Registered Successfully!", {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-                transition: Bounce,
-              })}
           </div>
         </div>
       </div>
+      {/* Include ToastContainer for rendering toasts */}
+      <ToastContainer />
     </div>
   );
 }
