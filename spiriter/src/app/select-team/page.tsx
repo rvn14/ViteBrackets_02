@@ -4,6 +4,9 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import PlayerCard from "@/components/playerCard";
 import PlayerStatsCard from "@/components/PlayerStatsCard";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { set } from "mongoose";
 
 type Player = {
   _id: string;
@@ -43,7 +46,6 @@ export default function SelectTeam() {
   const [activeView, setActiveView] = useState<"card" | "stats">("card");
   const [userData, setUserData] = useState<UserData | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-
   // Track leftover budget in state
   const [leftoverBudget, setLeftoverBudget] = useState<number>(0);
 
@@ -60,22 +62,22 @@ export default function SelectTeam() {
         const teamRes = await axios.get(`/api/teams/${userData.userId}`);
         console.log("Fetched team data:", teamRes.data);
         if (teamRes.data && teamRes.data.players) {
-          const processedPlayers = (Array.isArray(teamRes.data.players) ? teamRes.data.players : []).map(
-            (player: Player) => ({
-              ...player,
-              battingStrikeRate: player.ballsFaced
-                ? (player.runs / player.ballsFaced) * 100
+          const processedPlayers = (Array.isArray(teamRes.data.players)
+            ? teamRes.data.players
+            : []
+          ).map((player: Player) => ({
+            ...player,
+            battingStrikeRate: player.ballsFaced
+              ? (player.runs / player.ballsFaced) * 100
+              : 0,
+            economyRate:
+              player.oversBowled && player.runsConceded
+                ? player.runsConceded / player.oversBowled
                 : 0,
-              economyRate:
-                player.oversBowled && player.runsConceded
-                  ? player.runsConceded / player.oversBowled
-                  : 0,
-              inningsPlayed: player.inningsPlayed || 1,
-              oversBowled: player.oversBowled || 0,
-              runsConceded: player.runsConceded || 0,
-
-            })
-          );
+            inningsPlayed: player.inningsPlayed || 1,
+            oversBowled: player.oversBowled || 0,
+            runsConceded: player.runsConceded || 0,
+          }));
           console.log("Fetched team data: of user", processedPlayers);
           setTeam(processedPlayers);
         }
@@ -118,37 +120,36 @@ export default function SelectTeam() {
 
   const addPlayer = (player: Player) => {
     if (team.length >= 11) {
-      alert("Your team already has 11 players.");
+      toast.error("Your team already has 11 players.");
       return;
     }
     if (team.some((p) => p._id === player._id)) {
-      alert("This player is already in your team.");
+      toast.error("This player is already in your team.");
       return;
     }
-
     const newCost = leftoverBudget - (player.playerValue || 0);
     if (newCost < 0) {
-      alert("Not enough budget to add this player!");
+      toast.error("Not enough budget to add this player!");
       return;
     }
-
     const newTeam = [...team, player];
     setTeam(newTeam);
     setLeftoverBudget(newCost);
+    toast.success("Player added to your team!");
   };
 
   const removePlayer = (playerId: string) => {
     const playerToRemove = team.find((p) => p._id === playerId);
     if (!playerToRemove) return;
-
     const newTeam = team.filter((p) => p._id !== playerId);
     setTeam(newTeam);
     setLeftoverBudget(leftoverBudget + (playerToRemove.playerValue || 0));
+    toast.info("Player removed from your team.");
   };
 
   const saveTeam = async () => {
     if (!userData || !userData.userId) {
-      setError("User not found. Please log in again.");
+      toast.error("User not found. Please log in again.");
       return;
     }
 
@@ -165,18 +166,22 @@ export default function SelectTeam() {
         setLeftoverBudget(res.data.budget);
       }
 
-      alert("Team saved successfully!");
+      toast.success("Team saved successfully!", {
+        onClose: () => {
+          router.push("/team");
+        }
+      });
+
       router.push("/team");
     } catch (err: any) {
       console.error("Error saving team:", err);
-      setError(err.response?.data?.message || "Failed to save team.");
+      toast.error(err.response?.data?.message || "Failed to save team.");
     }
   };
 
-  // Rest of your component (UI rendering) stays the same
   return (
     <div className="min-h-screen w-full px-4 sm:px-6 lg:px-8 lg:mt-8">
-      {/* Existing JSX... */}
+      {/* Background and layout */}
       <div className="fixed top-0 left-1/4 w-1/2 h-[500px] bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0 rounded-full"></div>
       <div className="relative z-10 max-w-7xl mx-auto py-8"></div>
       <div className="bg-gray-800 text-white p-4 sm:p-6 rounded-lg shadow-lg mb-8">
@@ -251,10 +256,7 @@ export default function SelectTeam() {
                         _id: player._id,
                         name: player.name,
                         university: player.university,
-                        category: player.category as
-                          | "Batsman"
-                          | "Bowler"
-                          | "All-Rounder",
+                        category: player.category as "Batsman" | "Bowler" | "All-Rounder",
                         runs: player.runs,
                         ballsFaced: player.ballsFaced,
                         inningsPlayed: player.inningsPlayed || 1,
@@ -374,10 +376,7 @@ export default function SelectTeam() {
                       _id: player._id,
                       name: player.name,
                       university: player.university,
-                      category: player.category as
-                        | "Batsman"
-                        | "Bowler"
-                        | "All-Rounder",
+                      category: player.category as "Batsman" | "Bowler" | "All-Rounder",
                       runs: player.runs,
                       ballsFaced: player.ballsFaced,
                       inningsPlayed: player.inningsPlayed || 1,
@@ -450,6 +449,8 @@ export default function SelectTeam() {
           View Team
         </button>
       </div>
+      {/* ToastContainer for notifications */}
+      <ToastContainer />
     </div>
   );
 }
