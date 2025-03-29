@@ -37,13 +37,14 @@ export interface DerivedAttributes {
     const battingAverage = inningsPlayed > 0
       ? (totalRuns / inningsPlayed)
       : 0;
-  
+
+    // 
     const bowlingStrikeRate = totalWicketsTaken > 0
-      ? (totalBallsBowled / totalWicketsTaken)
+      ? (totalBallsBowled / totalWicketsTaken)* 6
       : 0;
   
     const economyRate = totalBallsBowled > 0
-      ? (totalRunsConceded / totalBallsBowled) * 6
+      ? (totalRunsConceded / totalBallsBowled) 
       : 0;
   
     // Using your formula:
@@ -63,8 +64,9 @@ export interface DerivedAttributes {
     // Then round to nearest multiple of 50,000
     const rawValue = (9 * playerPoints + 100) * 1000;
   
-    function roundToNearest50000(val: number) {
-      return Math.round(val / 50000) * 50000;
+    function roundToNearest50000(val: number): number {
+      const remainder = val % 50000;
+      return remainder < 25000 ? val - remainder : val + (50000 - remainder);
     }
   
     const playerValue = roundToNearest50000(rawValue);
