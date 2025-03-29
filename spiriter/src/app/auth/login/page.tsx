@@ -2,8 +2,7 @@
 import gsap from "gsap";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { jwtDecode } from "jwt-decode";
-import { toast, Bounce } from "react-toastify";
+import { toast, ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function LoginPage() {
@@ -44,34 +43,44 @@ export default function LoginPage() {
     });
   }, []);
 
-
   // ✅ Real-time validation
-  const validateField = (name: string, value: string) => {
-    let error = "";
+  interface FormErrors {
+    username: string;
+    password: string;
+    auth: string;
+  }
 
+  type FieldName = "username" | "password";
+
+  const validateField = (name: FieldName, value: string): void => {
+    let error: string = "";
     if (name === "username" && value.length < 8) {
       error = "Username must be at least 8 characters long.";
     }
-
     if (name === "password" && value.length < 6) {
       error = "Password must be at least 6 characters long.";
     }
-
-    setErrors((prev) => ({ ...prev, [name]: error }));
+    setErrors((prev: FormErrors) => ({ ...prev, [name]: error }));
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  interface HandleChangeEvent extends React.ChangeEvent<HTMLInputElement> {}
+
+  const handleChange = (e: HandleChangeEvent): void => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-
     // Validate as user types
-    validateField(name, value);
+    validateField(name as FieldName, value);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  interface LoginResponse {
+    error?: string;
+    [key: string]: any;
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setSuccess("");
-    setErrors((prev) => ({ ...prev, auth: "" }));
+    setErrors((prev: typeof errors) => ({ ...prev, auth: "" }));
     setLoading(true);
     localStorage.setItem("isSigned", "true");
 
@@ -85,29 +94,29 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-
     if (errors.username || errors.password) {
       setLoading(false);
       return; // Stop submission if errors exist
     }
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response: Response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-
-      const data = await response.json();
+      const data: LoginResponse = await response.json();
       if (!response.ok) {
-        setErrors((prev) => ({ ...prev, auth: data.error || "Login failed." }));
+        setErrors((prev: typeof errors) => ({
+          ...prev,
+          auth: data.error || "Login failed.",
+        }));
       } else {
-
         setSuccess("Login successful! Redirecting...");
         setTimeout(() => router.push("/"), 2000);
       }
-    } catch (error) {
-      setErrors((prev) => ({
+    } catch (error: unknown) {
+      setErrors((prev: typeof errors) => ({
         ...prev,
         auth: "An error occurred. Please try again.",
       }));
@@ -116,6 +125,13 @@ export default function LoginPage() {
     }
   };
 
+  // Use an effect to trigger the toast only when success is updated.
+  useEffect(() => {
+    if (success) {
+      toast.success(success, { transition: Bounce });
+    }
+  }, [success]);
+
   return (
     <div className="loginpage relative w-full h-screen flex justify-center items-center bg-gray-950 text-white">
       <img
@@ -123,7 +139,7 @@ export default function LoginPage() {
         src="/images/grid.png"
         alt=""
       />
-      <div className="absolute gradDot top-0 rounded-full w-1/2 h-[500px]  bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0"></div>
+      <div className="absolute gradDot top-0 rounded-full w-1/2 h-[500px] bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0"></div>
       <div className="flex items-center justify-center w-3/5 h-full z-20">
         <div className="hidden xl:flex w-full p- ">
           <img
@@ -178,12 +194,7 @@ export default function LoginPage() {
 
               {/* Authentication Error */}
               {errors.auth && <p style={{ color: "red" }}>{errors.auth}</p>}
-
-              <p className="underline m-0 text-end text-cyan-400 decoration-cyan-600">
-                <span className="cursor-pointer text-[9px] font-bold hover:text-cyan-300">
-                  Forgot Password?
-                </span>
-              </p>
+              
               <button
                 type="submit"
                 className="py-[10px] px-[15px] rounded-[20px] outline-none bg-gradient-to-r from-cyan-500 to-blue-500 text-white cursor-pointer shadow-[0_3px_8px_rgba(0,0,0,0.24)] active:shadow-none hover:scale-97 transition duration-100 ease-in"
@@ -202,13 +213,22 @@ export default function LoginPage() {
                 Sign up
               </span>
             </p>
-
-            {/* Success Message */}
-            {success &&
-              toast.success("Logged in Successfully!")}
           </div>
         </div>
       </div>
+      {/* ToastContainer is required for the toasts to appear */}
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        transition={Bounce} 
+        hideProgressBar={false} 
+        newestOnTop={false} 
+        closeOnClick 
+        rtl={false} 
+        pauseOnFocusLoss 
+        draggable 
+        pauseOnHover
+      />
     </div>
   );
 }
