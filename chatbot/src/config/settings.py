@@ -16,4 +16,4 @@ CLASSIFIER_GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY_2')
 MODEL_NAME = 'gemini-1.5-pro'
 
 # CORS settings
-CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000')
+CORS_ORIGINS = os.getenv('CORS_ORIGINS')
