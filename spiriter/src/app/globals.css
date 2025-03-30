@@ -77,3 +77,7 @@
     background-color: #76b6e4;
     border-radius: 5px;
   }
+
+  .budget::-webkit-scrollbar{
+    display: none;
+  }

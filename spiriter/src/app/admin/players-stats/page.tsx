@@ -9,7 +9,7 @@ export default function PlayerStatsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterUniversity, setFilterUniversity] = useState("");
-  const [valueRange, setValueRange] = useState<[number, number]>([0, 1000000]);
+  const [valueRange, setValueRange] = useState<[number, number]>([0, Infinity]);
 
   useEffect(() => {
     async function fetchPlayers() {
@@ -71,7 +71,7 @@ export default function PlayerStatsPage() {
           <option value="">All Categories</option>
           <option value="Batsman">Batsman</option>
           <option value="Bowler">Bowler</option>
-          <option value="All-rounder">All-rounder</option>
+          <option value="All-rounder">All-Rounder</option>
         </select>
         {/* University Filter */}
         <input
