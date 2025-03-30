@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 export default function Provider({ children }: { children: React.ReactNode }) {
 
   const pathname = usePathname();
-  const hiddenPaths = ["/auth/login", "/auth/signup", "/", ...pathname.startsWith("/admin") ? [pathname] : []];
+  const hiddenPaths = ["/auth/login", "/auth/signup", ...pathname.startsWith("/admin") ? [pathname] : []];
   const show = !hiddenPaths.includes(pathname);
 
   return (
