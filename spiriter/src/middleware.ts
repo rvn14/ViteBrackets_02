@@ -50,7 +50,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/", // Add homepage to matcher
     "/admin/:path*",
     "/team", // Add team page to matcher
     "/budget/:path*",
