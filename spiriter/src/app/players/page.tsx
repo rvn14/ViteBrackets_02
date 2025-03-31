@@ -67,7 +67,7 @@ export default function Players() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-[#000018] px-4 sm:px-6 lg:px-8 lg:mt-8">
+    <div className="min-h-screen w-full bg-[#000018] px-4 sm:px-6 lg:px-8 lg:mt-8 mt-10">
       <div className="fixed top-0 left-1/4 w-1/2 h-[500px] bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0 rounded-full"></div>
       <div className="relative z-10 max-w-7xl mx-auto py-8"></div>
       <div className="bg-gray-800 text-white p-4 sm:p-6 rounded-lg shadow-lg mb-8">
