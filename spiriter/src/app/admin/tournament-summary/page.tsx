@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { GiCricketBat } from 'react-icons/gi';
+import React, { useEffect, useState } from "react";
+import { GiCricketBat } from "react-icons/gi";
 
 interface Player {
   _id: string;
@@ -23,7 +23,9 @@ export default function TournamentSummaryPage() {
   useEffect(() => {
     async function fetchPlayers() {
       try {
-        const res = await fetch('/api/admin/players', { credentials: 'include' });
+        const res = await fetch("/api/admin/players", {
+          credentials: "include",
+        });
         if (!res.ok) {
           throw new Error(`Error: ${res.status} ${res.statusText}`);
         }
@@ -44,11 +46,13 @@ export default function TournamentSummaryPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-800 to-gray-900 text-white">
-        <p className="text-xl animate-pulse">Loading tournament summary...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-8">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-cyan-500"></div>
+        <p className="ml-3 text-white/80">Loading tournament summary...</p>
       </div>
     );
   }
+  
 
   if (error) {
     return (
@@ -90,17 +94,33 @@ export default function TournamentSummaryPage() {
   );
 
   return (
-    <div className="p-8 min-h-screen text-white">
-      <h1 className="text-4xl font-black mb-8 text-center">Tournament Summary</h1>
-      
+    <div className="p-4 sm:p-8 min-h-screen text-white">
+      <h1 className="text-3xl sm:text-4xl font-black mb-6 sm:mb-8 text-center">
+        Tournament Summary
+      </h1>
+
       {/* First Row: Total Runs & Total Wickets */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-        <SummaryCard title="Total Runs" value={totalRuns.toString()} icon={<GiCricketBat className="w-12 h-12" />} />
-        <SummaryCard title="Total Wickets" value={totalWickets.toString()} icon={<img src="/images/cricket-ball.png" alt="Stumps Icon" className="w-12 h-12 rounded-full bg-white" />} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <SummaryCard
+          title="Total Runs"
+          value={totalRuns.toString()}
+          icon={<GiCricketBat className="w-8 h-8 sm:w-12 sm:h-12" />}
+        />
+        <SummaryCard
+          title="Total Wickets"
+          value={totalWickets.toString()}
+          icon={
+            <img
+              src="/images/cricket-ball.png"
+              alt="Stumps Icon"
+              className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-white"
+            />
+          }
+        />
       </div>
 
       {/* Second Row: Top Performers */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <TopPlayerCard
           title="Highest Run Scorer"
           playerName={highestRunScorer.name}
@@ -126,36 +146,58 @@ export default function TournamentSummaryPage() {
   );
 }
 
-/** 🏆 Summary Card (Left-Aligned Icon for Total Runs & Wickets) */
-function SummaryCard({ title, value, icon }: { title: string; value: string; icon: React.ReactNode }) {
+// Updated component definitions with responsive sizes
+function SummaryCard({
+  title,
+  value,
+  icon,
+}: {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+}) {
   return (
-    <div className="flex items-center justify-around  bg-blue-200/50 rounded-lg shadow-xl p-6 border text-center border-cyan-500/60">
+    <div className="flex items-center justify-around bg-blue-200/50 rounded-lg shadow-xl p-4 sm:p-6 border text-center border-cyan-500/60">
       <div className="text-white">{icon}</div>
-      <div className="ml-4 ">
-        <h2 className="text-lg font-semibold text-gray-300">{title}</h2>
-        <p className="text-3xl font-extrabold text-white">{value}</p>
+      <div className="ml-4">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-300">
+          {title}
+        </h2>
+        <p className="text-xl sm:text-3xl font-extrabold text-white">{value}</p>
       </div>
     </div>
   );
 }
 
-/** 🏅 Top Player Card (Bigger First Name, Smaller Last Name) */
-function TopPlayerCard({ title, playerName, value }: { title: string; playerName: string; value: string }) {
+function TopPlayerCard({
+  title,
+  playerName,
+  value,
+}: {
+  title: string;
+  playerName: string;
+  value: string;
+}) {
   const [firstName, ...lastNameParts] = playerName.split(" ");
   const lastName = lastNameParts.join(" ");
 
   return (
-    <div className="flex flex-col items-center justify-center p-6  bg-blue-200/50 rounded-lg shadow-xl border border-cyan-500/60 transition-transform transform hover:scale-105">
+    <div className="flex flex-col items-center justify-center p-4 sm:p-6 bg-blue-200/50 rounded-lg shadow-xl border border-cyan-500/60 transition-transform transform hover:scale-105">
       <img
         src="https://www.shareicon.net/data/128x128/2016/06/27/787169_people_512x512.png"
         alt="player"
-        className="w-32 h-32 mb-3 rounded-full"
+        className="w-20 h-20 sm:w-32 sm:h-32 mb-2 sm:mb-3 rounded-full"
       />
-      <h2 className="text-md font-semibold text-gray-300 mb-2.5">{title}</h2>
-      <p className="text-xl font-bold text-white">
-        {firstName} <span className="text-sm font-light">{lastName}</span>
+      <h2 className="text-sm sm:text-md font-semibold text-gray-300 mb-1 sm:mb-2.5">
+        {title}
+      </h2>
+      <p className="text-lg sm:text-xl font-bold text-white">
+        {firstName}{" "}
+        <span className="text-xs sm:text-sm font-light">{lastName}</span>
       </p>
-      <p className="text-3xl font-semibold text-cyan-400 mt-2">{value}</p>
+      <p className="text-xl sm:text-3xl font-semibold text-cyan-400 mt-1 sm:mt-2">
+        {value}
+      </p>
     </div>
   );
 }
