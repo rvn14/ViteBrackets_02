@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import swal from "sweetalert"; // Imported swal for confirmation dialogs
-import { FaChevronLeft, FaChevronRight, FaTrash } from "react-icons/fa"; // Imported bin icon
+import swal from "sweetalert";
+import { FaChevronLeft, FaChevronRight, FaTrash } from "react-icons/fa";
 
 interface User {
   _id: string;
@@ -150,8 +150,9 @@ export default function ManageUsers() {
 
   if (loading) {
     return (
-      <div className="p-6 text-white">
-        <p>Loading...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-8">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-cyan-500"></div>
+        <p className="ml-3 text-white/80">Loading Users...</p>
       </div>
     );
   }
@@ -162,49 +163,61 @@ export default function ManageUsers() {
   const paginatedUsers = users.slice(startIndex, startIndex + pageSize);
 
   return (
-    <div className="min-h-screen p-6 text-white z-1000 px-24">
-      <h1 className="text-4xl text-center font-black mb-6">Manage Users</h1>
+    <div className="min-h-screen p-4 sm:p-6 text-white z-10 px-4 sm:px-8 md:px-12 lg:px-16 xl:px-24">
+      <h1 className="text-3xl sm:text-4xl text-center font-black mb-4 sm:mb-6">
+        Manage Users
+      </h1>
 
+      {/* Responsive table with horizontal scroll on small screens */}
       <div className="overflow-x-auto shadow-lg rounded-lg border border-white/10 bg-white/5 bg-opacity-10">
         <table className="min-w-full border-collapse text-left text-sm font-popins">
           <thead className="bg-white/10 backdrop-blur-2xl bg-opacity-60 text-gray-200">
             <tr>
-              <th className="border-b border-white/5 p-4 text-center font-medium">Username</th>
-              <th className="border-b border-white/5 p-4 text-center font-medium">Role</th>
-              <th className="border-b border-white/5 p-4 text-center font-medium">Actions</th>
+              <th className="border-b border-white/5 p-3 sm:p-4 text-center font-medium">
+                Username
+              </th>
+              <th className="border-b border-white/5 p-3 sm:p-4 text-center font-medium">
+                Role
+              </th>
+              <th className="border-b border-white/5 p-3 sm:p-4 text-center font-medium">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
             {paginatedUsers.map((user) => (
-              <tr key={user._id} className="text-center hover:bg-white/5 hover:bg-opacity-40">
-                <td className="p-4 border-white/5">{user.username}</td>
-                <td className="p-4 border-white/5">
+              <tr
+                key={user._id}
+                className="text-center hover:bg-white/5 hover:bg-opacity-40"
+              >
+                <td className="p-3 sm:p-4 border-white/5">{user.username}</td>
+                <td className="p-3 sm:p-4 border-white/5">
                   {user.isAdmin ? "Admin" : "User"}
                 </td>
-                <td className="p-4 border-white/5">
+                <td className="p-2 sm:p-4 border-white/5">
                   {currentUser?._id !== user._id ? (
-                    <div className="flex justify-center gap-2">
+                    <div className="flex flex-col sm:flex-row justify-center gap-2">
                       {/* Toggle admin button with confirmation */}
                       <button
                         onClick={() => confirmToggleAdminStatus(user._id)}
-                        className={`w-40 px-3 py-1 rounded font-semibold transition-colors bg-gradient-to-r ${
+                        className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded font-semibold transition-colors bg-gradient-to-r ${
                           user.isAdmin
                             ? "from-red-500/80 to-red-600/80 hover:from-red-600 hover:to-red-700"
                             : "from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
-                        } text-white backdrop-blur-md bg-white/20`}
+                        } text-white backdrop-blur-md bg-white/20 w-full sm:w-40`}
                       >
                         {user.isAdmin ? "Demote to User" : "Make Admin"}
                       </button>
                       {/* Delete button with bin icon and swal confirmation */}
-                        <button
+                      <button
                         onClick={() => confirmDeleteUser(user._id)}
-                        className="p-2 rounded transition-colors hover:bg-gray-700"
+                        className="p-2 rounded transition-colors hover:bg-gray-700 flex justify-center"
                       >
-                        <FaTrash size={20} color="rgba(240,50,10,0.8)"/>
+                        <FaTrash size={16} color="rgba(240,50,10,0.8)" />
                       </button>
                     </div>
                   ) : (
-                    <span className="text-gray-400 bg-white/10 p-2 rounded">
+                    <span className="text-xs sm:text-sm text-gray-400 bg-white/10 p-1 sm:p-2 rounded">
                       Cannot modify yourself
                     </span>
                   )}
@@ -225,11 +238,13 @@ export default function ManageUsers() {
           >
             <FaChevronLeft size={20} />
           </button>
-          <span>
+          <span className="text-sm sm:text-base">
             Page {currentPage} of {totalPages}
           </span>
           <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
             className="p-2 bg-gray-700 rounded disabled:opacity-50"
           >
