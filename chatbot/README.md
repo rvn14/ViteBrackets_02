@@ -61,6 +61,7 @@ This guide will help you set up and run the chatbot in a virtual environment.
    MONGO_URI=your_mongo_connection_string
    GOOGLE_API_KEY_1=your_api_key
    GOOGLE_API_KEY_2=your_api_key
+   CORS_ORIGINS=frontend_url
    ```
 3. **Paste any required API keys** in the `.env` file as needed.
 

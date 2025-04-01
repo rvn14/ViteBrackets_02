@@ -9,7 +9,7 @@ import { calculateDerivedAttributes } from '@/lib/calculateDerivedAttributes';
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await connectToDatabase();
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json({ message: "Player ID is required" }, { status: 400 });

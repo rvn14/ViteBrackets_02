@@ -43,7 +43,6 @@ export default function Home() {
 
   return (
     <div ref={refwrapper} className="w-full h-screen overflow-hidden">
-      <Navbar />
       <main
         ref={refcontent}
         className="bg-[#000018] w-full flex flex-col items-center relative"

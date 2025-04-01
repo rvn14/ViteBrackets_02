@@ -180,7 +180,7 @@ export default function SelectTeam() {
   };
 
   return (
-    <div className="min-h-screen w-full px-4 sm:px-6 lg:px-8 lg:mt-8">
+    <div className="min-h-screen w-full px-4 sm:px-6 lg:px-8 lg:mt-8 mt-10">
       {/* Background and layout */}
       <div className="fixed top-0 left-1/4 w-1/2 h-[500px] bg-[#1789DC] blur-[150px] transform -translate-y-1/2 z-0 rounded-full"></div>
       <div className="relative z-10 max-w-7xl mx-auto py-8"></div>

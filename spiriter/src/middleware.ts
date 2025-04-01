@@ -4,23 +4,44 @@ import { jwtVerify } from "jose/jwt/verify";
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
-
   const openPaths = ["/", "/players", "/leaderboard"];
+  
+  const adminPaths =
+    request.nextUrl.pathname.startsWith("/admin") ||
+    request.nextUrl.pathname.startsWith("/api/admin");
 
-  // Fix typo in openPaths
-  if (!token && !openPaths.includes(request.nextUrl.pathname)) {
+  // Check if this is an open path
+  if (openPaths.includes(request.nextUrl.pathname)) {
+    // For open paths with a token (logged in user who is admin)
+    if (token) {
+      try {
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+        const { payload } = await jwtVerify(token, secret);
+        const isAdmin = payload.isAdmin;
+
+        // Redirect admin to admin dashboard if they visit open paths
+        if (isAdmin && request.nextUrl.pathname === "/") {
+          return NextResponse.redirect(new URL("/admin/players", request.url));
+        }
+      } catch (error) {
+        // Token error but on open path - just continue
+        console.error("Token error on open path:", error);
+      }
+    }
+
+    // Allow access to open paths regardless of login
+    return NextResponse.next();
+  }
+
+  // For protected paths - require token
+  if (!token) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
   try {
-    if (!token) {
-      throw new Error("Token is missing");
-    }
-
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
     const isAdmin = payload.isAdmin;
-
 
     // Admin Protection
     if (request.nextUrl.pathname.startsWith("/admin") && !isAdmin) {
@@ -28,15 +49,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
-    // NEW: Check if admin user has just logged in and is on the homepage
-    // or is trying to access a non-admin-specific page
-    if (
-      isAdmin &&
-      (request.nextUrl.pathname === "/" ||
-        request.nextUrl.pathname === "/team" ||
-        request.nextUrl.pathname === "/select-team")
-    ) {
-      console.log("✅ Admin login detected - redirecting to admin dashboard");
+    // Redirect admin to admin dashboard for user pages
+    if (isAdmin && !adminPaths) {
+      console.log("✅ Admin on user page - redirecting to admin dashboard");
       return NextResponse.redirect(new URL("/admin/players", request.url));
     }
 
@@ -50,9 +65,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/", // Add homepage to matcher
+    "/",
+    "/players",
+    "/leaderboard",
     "/admin/:path*",
-    "/team", // Add team page to matcher
+    "/team",
     "/budget/:path*",
     "/teams/:path*",
     "/select-team/:path*",
